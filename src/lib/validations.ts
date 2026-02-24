@@ -89,6 +89,29 @@ export const serviceSchema = z.object({
   priceBasis: z.string().optional(),
 });
 
+export const toolSchema = z.object({
+  name: z.string().min(2, 'Tool name is required'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  shortDescription: z.string().optional(),
+  categoryId: z.string().min(1, 'Category is required'),
+  condition: z.enum(['NEW', 'FAIRLY_USED', 'USED', 'REFURBISHED']),
+  brandName: z.string().optional(),
+  modelNumber: z.string().optional(),
+  quantityAvailable: z.number().int().min(1).optional(),
+  listingPurpose: z.enum(['SALE', 'LEASE', 'BOTH']),
+  salePricingType: z.enum(['FIXED', 'NEGOTIABLE', 'BOTH']).optional(),
+  salePrice: z.number().min(0).optional(),
+  leasePricingType: z.enum(['FIXED', 'NEGOTIABLE', 'BOTH']).optional(),
+  leaseRate: z.number().min(0).optional(),
+  leaseRatePeriod: z.enum(['HOURLY', 'DAILY', 'WEEKLY', 'MONTHLY', 'SEASONAL']).optional(),
+  depositRequired: z.enum(['REQUIRED', 'NOT_REQUIRED', 'NEGOTIABLE']).optional(),
+  depositAmount: z.number().min(0).optional(),
+  pickupLocation: z.string().optional(),
+  pickupLocationState: z.string().optional(),
+  deliveryAvailable: z.boolean().optional(),
+  tags: z.array(z.string()).optional(),
+});
+
 export const ratingSchema = z.object({
   memberId: z.string(),
   ratingCategory: z.enum([
@@ -112,5 +135,6 @@ export type ClientRegisterFormData = z.infer<typeof clientRegisterSchema>;
 export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 export type ProductFormData = z.infer<typeof productSchema>;
 export type ServiceFormData = z.infer<typeof serviceSchema>;
+export type ToolFormData = z.infer<typeof toolSchema>;
 export type RatingFormData = z.infer<typeof ratingSchema>;
 export type AdminLoginFormData = z.infer<typeof adminLoginSchema>;

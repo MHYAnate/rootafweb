@@ -10,6 +10,7 @@ interface Props {
   showValue?: boolean;
   totalRatings?: number;
   interactive?: boolean;
+  className?: string;
   onRate?: (rating: number) => void;
 }
 
