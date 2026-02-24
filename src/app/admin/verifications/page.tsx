@@ -61,7 +61,7 @@ export default function VerificationsPage() {
                         {user.memberProfile && (
                           <>
                             <span>•</span>
-                            <span>{PROVIDER_TYPE_MAP[user.memberProfile.providerType]}</span>
+                            <span>{PROVIDER_TYPE_MAP[user.memberProfile.providerType] as any}</span>
                           </>
                         )}
                       </div>
