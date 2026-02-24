@@ -2,62 +2,58 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { jwtDecode } from 'jwt-decode';
 
-interface User {
-  id: string;
-  phoneNumber: string;
-  fullName: string;
-  email?: string;
-  userType: 'MEMBER' | 'CLIENT' | 'ADMIN';
-  verificationStatus: string;
+interface AdminPermissions {
+  canVerifyMembers: boolean;
+  canVerifyClients: boolean;
+  canResetPasswords: boolean;
+  canManageContent: boolean;
+  canManageEvents: boolean;
+  canManageAdmins: boolean;
+  canExportData: boolean;
+  canAccessReports: boolean;
 }
 
-interface AuthState {
-  user: User | null;
+interface AdminUser {
+  id: string;
+  username: string;
+  fullName: string;
+  role: string;
+  mustChangePassword: boolean;
+  permissions: AdminPermissions;
+}
+
+interface AdminAuthState {
+  admin: AdminUser | null;
   accessToken: string | null;
-  refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-
-  setAuth: (user: User, accessToken: string, refreshToken: string) => void;
-  setUser: (user: User) => void;
+  setAuth: (admin: AdminUser, accessToken: string) => void;
   logout: () => void;
   checkAuth: () => void;
-  getToken: () => string | null;
+  hasPermission: (permission: keyof AdminPermissions) => boolean;
 }
 
-export const useAuthStore = create<AuthState>()(
+export const useAdminAuthStore = create<AdminAuthState>()(
   persist(
     (set, get) => ({
-      user: null,
+      admin: null,
       accessToken: null,
-      refreshToken: null,
       isAuthenticated: false,
       isLoading: true,
 
-      setAuth: (user, accessToken, refreshToken) => {
-        set({
-          user,
-          accessToken,
-          refreshToken,
-          isAuthenticated: true,
-          isLoading: false,
-        });
-      },
-
-      setUser: (user) => {
-        set({ user });
+      setAuth: (admin, accessToken) => {
+        set({ admin, accessToken, isAuthenticated: true, isLoading: false });
       },
 
       logout: () => {
         set({
-          user: null,
+          admin: null,
           accessToken: null,
-          refreshToken: null,
           isAuthenticated: false,
           isLoading: false,
         });
         if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+          window.location.href = '/admin/login';
         }
       },
 
@@ -79,10 +75,15 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      getToken: () => get().accessToken,
+      hasPermission: (permission) => {
+        const { admin } = get();
+        if (!admin) return false;
+        if (admin.role === 'SUPER_ADMIN') return true;
+        return admin.permissions?.[permission] ?? false;
+      },
     }),
     {
-      name: 'urafd-auth',
+      name: 'urafd-admin-auth',
       storage: createJSONStorage(() => {
         if (typeof window !== 'undefined') return localStorage;
         return {
@@ -92,9 +93,8 @@ export const useAuthStore = create<AuthState>()(
         };
       }),
       partialize: (state) => ({
-        user: state.user,
+        admin: state.admin,
         accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
     },

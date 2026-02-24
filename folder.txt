@@ -1,0 +1,460 @@
+frontend/
+├── public/
+│   ├── images/
+│   │   ├── logo.png                           # Foundation logo
+│   │   ├── logo-dark.png                      # Dark version
+│   │   ├── favicon.ico                        # Browser favicon
+│   │   ├── hero-banner.jpg                    # Home page hero image
+│   │   ├── about-hero.jpg                     # About page hero
+│   │   ├── placeholder-profile.png            # Default profile picture
+│   │   ├── placeholder-product.png            # Default product image
+│   │   └── og-image.jpg                       # Social media preview image
+│   │
+│   ├── icons/
+│   │   ├── apple-touch-icon.png
+│   │   ├── icon-192x192.png
+│   │   └── icon-512x512.png
+│   │
+│   └── manifest.json                          # PWA manifest
+│
+├── src/
+│   ├── app/                                   # Next.js App Router pages
+│   │   ├── layout.tsx                         # Root layout
+│   │   ├── page.tsx                           # Home page
+│   │   ├── loading.tsx                        # Root loading state
+│   │   ├── error.tsx                          # Root error boundary
+│   │   ├── not-found.tsx                      # 404 page
+│   │   ├── globals.css                        # Global styles
+│   │   │
+│   │   ├── (public)/                          # Public pages (no auth needed)
+│   │   │   ├── layout.tsx                     # Public layout with navbar/footer
+│   │   │   │
+│   │   │   ├── about/
+│   │   │   │   ├── page.tsx                   # About page
+│   │   │   │   └── loading.tsx
+│   │   │   │
+│   │   │   ├── members/
+│   │   │   │   ├── page.tsx                   # Members directory/listing
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── [id]/
+│   │   │   │       ├── page.tsx               # Individual member profile
+│   │   │   │       └── loading.tsx
+│   │   │   │
+│   │   │   ├── products/
+│   │   │   │   ├── page.tsx                   # Products listing
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── [id]/
+│   │   │   │       ├── page.tsx               # Product detail
+│   │   │   │       └── loading.tsx
+│   │   │   │
+│   │   │   ├── services/
+│   │   │   │   ├── page.tsx                   # Services listing
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── [id]/
+│   │   │   │       ├── page.tsx               # Service detail
+│   │   │   │       └── loading.tsx
+│   │   │   │
+│   │   │   ├── tools/
+│   │   │   │   ├── page.tsx                   # Tools marketplace
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── [id]/
+│   │   │   │       ├── page.tsx               # Tool detail
+│   │   │   │       └── loading.tsx
+│   │   │   │
+│   │   │   ├── events/
+│   │   │   │   ├── page.tsx                   # Events listing
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── [id]/
+│   │   │   │       ├── page.tsx               # Event detail
+│   │   │   │       └── loading.tsx
+│   │   │   │
+│   │   │   ├── search/
+│   │   │   │   └── page.tsx                   # Search results
+│   │   │   │
+│   │   │   ├── contact/
+│   │   │   │   └── page.tsx                   # Contact page
+│   │   │   │
+│   │   │   └── faq/
+│   │   │       └── page.tsx                   # FAQ page
+│   │   │
+│   │   ├── (auth)/                            # Authentication pages
+│   │   │   ├── layout.tsx                     # Auth layout (centered forms)
+│   │   │   │
+│   │   │   ├── login/
+│   │   │   │   └── page.tsx                   # Login page
+│   │   │   │
+│   │   │   ├── register/
+│   │   │   │   ├── page.tsx                   # Registration type selection
+│   │   │   │   ├── member/
+│   │   │   │   │   └── page.tsx               # Member registration form
+│   │   │   │   └── client/
+│   │   │   │       └── page.tsx               # Client registration form
+│   │   │   │
+│   │   │   ├── forgot-password/
+│   │   │   │   └── page.tsx                   # Password reset request
+│   │   │   │
+│   │   │   └── verification-pending/
+│   │   │       └── page.tsx                   # Waiting for admin verification
+│   │   │
+│   │   ├── (dashboard)/                       # Authenticated user pages
+│   │   │   ├── layout.tsx                     # Dashboard layout with sidebar
+│   │   │   │
+│   │   │   ├── dashboard/
+│   │   │   │   └── page.tsx                   # User dashboard home
+│   │   │   │
+│   │   │   ├── profile/
+│   │   │   │   ├── page.tsx                   # View/Edit profile
+│   │   │   │   └── edit/
+│   │   │   │       └── page.tsx               # Edit profile form
+│   │   │   │
+│   │   │   ├── my-products/
+│   │   │   │   ├── page.tsx                   # List my products
+│   │   │   │   ├── new/
+│   │   │   │   │   └── page.tsx               # Create new product
+│   │   │   │   └── [id]/
+│   │   │   │       └── edit/
+│   │   │   │           └── page.tsx           # Edit product
+│   │   │   │
+│   │   │   ├── my-services/
+│   │   │   │   ├── page.tsx                   # List my services
+│   │   │   │   ├── new/
+│   │   │   │   │   └── page.tsx               # Create new service
+│   │   │   │   └── [id]/
+│   │   │   │       └── edit/
+│   │   │   │           └── page.tsx           # Edit service
+│   │   │   │
+│   │   │   ├── my-tools/
+│   │   │   │   ├── page.tsx                   # List my tools
+│   │   │   │   ├── new/
+│   │   │   │   │   └── page.tsx               # Create new tool listing
+│   │   │   │   └── [id]/
+│   │   │   │       └── edit/
+│   │   │   │           └── page.tsx           # Edit tool listing
+│   │   │   │
+│   │   │   ├── my-certificates/
+│   │   │   │   ├── page.tsx                   # List my certificates
+│   │   │   │   └── new/
+│   │   │   │       └── page.tsx               # Upload new certificate
+│   │   │   │
+│   │   │   ├── my-transactions/
+│   │   │   │   ├── page.tsx                   # Transaction history
+│   │   │   │   └── new/
+│   │   │   │       └── page.tsx               # Record new transaction
+│   │   │   │
+│   │   │   ├── my-ratings/
+│   │   │   │   └── page.tsx                   # View ratings received/given
+│   │   │   │
+│   │   │   ├── notifications/
+│   │   │   │   └── page.tsx                   # Notifications list
+│   │   │   │
+│   │   │   ├── saved/
+│   │   │   │   └── page.tsx                   # Saved/bookmarked items
+│   │   │   │
+│   │   │   └── settings/
+│   │   │       └── page.tsx                   # Account settings
+│   │   │
+│   │   └── admin/                             # Admin portal
+│   │       ├── layout.tsx                     # Admin layout
+│   │       │
+│   │       ├── login/
+│   │       │   └── page.tsx                   # Admin login
+│   │       │
+│   │       ├── dashboard/
+│   │       │   └── page.tsx                   # Admin dashboard
+│   │       │
+│   │       ├── verifications/
+│   │       │   ├── page.tsx                   # Pending verifications list
+│   │       │   └── [id]/
+│   │       │       └── page.tsx               # Review specific verification
+│   │       │
+│   │       ├── users/
+│   │       │   ├── page.tsx                   # All users list
+│   │       │   ├── members/
+│   │       │   │   └── page.tsx               # Members list
+│   │       │   ├── clients/
+│   │       │   │   └── page.tsx               # Clients list
+│   │       │   └── [id]/
+│   │       │       └── page.tsx               # User detail
+│   │       │
+│   │       ├── categories/
+│   │       │   ├── page.tsx                   # Manage categories
+│   │       │   └── new/
+│   │       │       └── page.tsx               # Create category
+│   │       │
+│   │       ├── content/
+│   │       │   ├── about/
+│   │       │   │   └── page.tsx               # Edit about page content
+│   │       │   ├── leadership/
+│   │       │   │   ├── page.tsx               # Manage leadership profiles
+│   │       │   │   └── new/
+│   │       │   │       └── page.tsx           # Add leadership profile
+│   │       │   ├── sponsors/
+│   │       │   │   ├── page.tsx               # Manage sponsors
+│   │       │   │   └── new/
+│   │       │   │       └── page.tsx           # Add sponsor
+│   │       │   ├── testimonials/
+│   │       │   │   ├── page.tsx               # Manage testimonials
+│   │       │   │   └── new/
+│   │       │   │       └── page.tsx           # Add testimonial
+│   │       │   └── documents/
+│   │       │       └── page.tsx               # Manage foundation documents
+│   │       │
+│   │       ├── events/
+│   │       │   ├── page.tsx                   # Manage events
+│   │       │   ├── new/
+│   │       │   │   └── page.tsx               # Create event
+│   │       │   └── [id]/
+│   │       │       └── edit/
+│   │       │           └── page.tsx           # Edit event
+│   │       │
+│   │       ├── password-resets/
+│   │       │   └── page.tsx                   # Process password resets
+│   │       │
+│   │       ├── reports/
+│   │       │   └── page.tsx                   # View reports & analytics
+│   │       │
+│   │       ├── settings/
+│   │       │   └── page.tsx                   # System settings
+│   │       │
+│   │       ├── admins/
+│   │       │   ├── page.tsx                   # Manage admin users
+│   │       │   └── new/
+│   │       │       └── page.tsx               # Create admin user
+│   │       │
+│   │       ├── activity-log/
+│   │       │   └── page.tsx                   # Admin activity log
+│   │       │
+│   │       └── announcements/
+│   │           ├── page.tsx                   # Manage announcements
+│   │           └── new/
+│   │               └── page.tsx               # Create announcement
+│   │
+│   ├── components/                            # Reusable components
+│   │   ├── ui/                                # shadcn/ui components (auto-generated)
+│   │   │   ├── button.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── card.tsx
+│   │   │   └── ... (all shadcn components)
+│   │   │
+│   │   ├── layout/                            # Layout components
+│   │   │   ├── header.tsx                     # Public site header/navbar
+│   │   │   ├── footer.tsx                     # Public site footer
+│   │   │   ├── mobile-nav.tsx                 # Mobile navigation
+│   │   │   ├── dashboard-sidebar.tsx          # User dashboard sidebar
+│   │   │   ├── dashboard-header.tsx           # Dashboard top header
+│   │   │   ├── admin-sidebar.tsx              # Admin panel sidebar
+│   │   │   ├── admin-header.tsx               # Admin top header
+│   │   │   └── breadcrumb-nav.tsx             # Dynamic breadcrumbs
+│   │   │
+│   │   ├── auth/                              # Authentication components
+│   │   │   ├── login-form.tsx                 # Login form component
+│   │   │   ├── member-register-form.tsx       # Member registration form
+│   │   │   ├── client-register-form.tsx       # Client registration form
+│   │   │   ├── forgot-password-form.tsx       # Password reset form
+│   │   │   └── auth-guard.tsx                 # Client-side auth protection
+│   │   │
+│   │   ├── members/                           # Member components
+│   │   │   ├── member-card.tsx                # Member card for listings
+│   │   │   ├── member-profile-view.tsx        # Full profile display
+│   │   │   ├── member-profile-form.tsx        # Profile edit form
+│   │   │   ├── member-stats.tsx               # Member statistics display
+│   │   │   ├── specialization-badge.tsx       # Specialization badge
+│   │   │   └── member-filter.tsx              # Filter sidebar for members
+│   │   │
+│   │   ├── products/                          # Product components
+│   │   │   ├── product-card.tsx               # Product card
+│   │   │   ├── product-detail-view.tsx        # Full product display
+│   │   │   ├── product-form.tsx               # Create/edit product form
+│   │   │   ├── product-gallery.tsx            # Product image gallery
+│   │   │   ├── price-display.tsx              # Price display component
+│   │   │   └── product-filter.tsx             # Product filter sidebar
+│   │   │
+│   │   ├── services/                          # Service components
+│   │   │   ├── service-card.tsx               # Service card
+│   │   │   ├── service-detail-view.tsx        # Full service display
+│   │   │   ├── service-form.tsx               # Create/edit service form
+│   │   │   ├── service-gallery.tsx            # Service image gallery
+│   │   │   └── service-filter.tsx             # Service filter sidebar
+│   │   │
+│   │   ├── tools/                             # Tool components
+│   │   │   ├── tool-card.tsx                  # Tool card
+│   │   │   ├── tool-detail-view.tsx           # Full tool display
+│   │   │   ├── tool-form.tsx                  # Create/edit tool form
+│   │   │   └── tool-filter.tsx                # Tool filter sidebar
+│   │   │
+│   │   ├── certificates/                      # Certificate components
+│   │   │   ├── certificate-card.tsx           # Certificate display card
+│   │   │   ├── certificate-form.tsx           # Upload certificate form
+│   │   │   └── certificate-gallery.tsx        # Certificate gallery
+│   │   │
+│   │   ├── ratings/                           # Rating components
+│   │   │   ├── rating-form.tsx                # Submit rating form
+│   │   │   ├── rating-display.tsx             # Display rating stars
+│   │   │   ├── rating-summary.tsx             # Rating breakdown display
+│   │   │   ├── review-card.tsx                # Individual review card
+│   │   │   └── review-list.tsx                # List of reviews
+│   │   │
+│   │   ├── transactions/                      # Transaction components
+│   │   │   ├── transaction-form.tsx           # Record transaction form
+│   │   │   ├── transaction-card.tsx           # Transaction card
+│   │   │   └── transaction-table.tsx          # Transaction table
+│   │   │
+│   │   ├── about/                             # About page components
+│   │   │   ├── mission-vision.tsx             # Mission & vision section
+│   │   │   ├── leadership-card.tsx            # Leadership profile card
+│   │   │   ├── leadership-grid.tsx            # Leadership grid layout
+│   │   │   ├── objectives-section.tsx         # Objectives display
+│   │   │   ├── foundation-documents.tsx       # Documents display
+│   │   │   └── contact-section.tsx            # Contact information
+│   │   │
+│   │   ├── sponsors/                          # Sponsor components
+│   │   │   ├── sponsor-card.tsx               # Sponsor card
+│   │   │   └── sponsor-grid.tsx               # Sponsors grid layout
+│   │   │
+│   │   ├── testimonials/                      # Testimonial components
+│   │   │   ├── testimonial-card.tsx           # Testimonial card
+│   │   │   └── testimonial-slider.tsx         # Testimonial carousel
+│   │   │
+│   │   ├── events/                            # Event components
+│   │   │   ├── event-card.tsx                 # Event card
+│   │   │   ├── event-detail-view.tsx          # Full event display
+│   │   │   ├── event-gallery.tsx              # Event photo gallery
+│   │   │   ├── event-agenda.tsx               # Event agenda display
+│   │   │   └── event-filter.tsx               # Event filter
+│   │   │
+│   │   ├── home/                              # Home page components
+│   │   │   ├── hero-section.tsx               # Hero banner
+│   │   │   ├── featured-members.tsx           # Featured members section
+│   │   │   ├── featured-products.tsx          # Featured products section
+│   │   │   ├── featured-services.tsx          # Featured services section
+│   │   │   ├── stats-section.tsx              # Statistics counters
+│   │   │   ├── testimonials-section.tsx       # Home testimonials
+│   │   │   ├── upcoming-events.tsx            # Upcoming events section
+│   │   │   ├── sponsors-section.tsx           # Sponsors logos section
+│   │   │   └── cta-section.tsx                # Call-to-action section
+│   │   │
+│   │   ├── search/                            # Search components
+│   │   │   ├── search-bar.tsx                 # Global search bar
+│   │   │   ├── search-results.tsx             # Search results display
+│   │   │   └── search-filters.tsx             # Search filter panel
+│   │   │
+│   │   ├── notifications/                     # Notification components
+│   │   │   ├── notification-bell.tsx          # Notification bell icon
+│   │   │   ├── notification-dropdown.tsx      # Notification dropdown
+│   │   │   └── notification-list.tsx          # Full notifications page
+│   │   │
+│   │   ├── admin/                             # Admin-specific components
+│   │   │   ├── verification-card.tsx          # Verification review card
+│   │   │   ├── verification-document-viewer.tsx # Document viewer
+│   │   │   ├── stats-cards.tsx                # Dashboard stat cards
+│   │   │   ├── recent-activity.tsx            # Recent admin activity
+│   │   │   ├── user-table.tsx                 # User management table
+│   │   │   ├── content-editor.tsx             # Rich text content editor
+│   │   │   ├── category-tree.tsx              # Category hierarchy tree
+│   │   │   └── data-table.tsx                 # Reusable data table
+│   │   │
+│   │   └── shared/                            # Shared/common components
+│   │       ├── image-upload.tsx               # Image upload with preview
+│   │       ├── multi-image-upload.tsx         # Multiple image upload
+│   │       ├── phone-input.tsx                # Phone number input
+│   │       ├── state-lga-select.tsx           # State & LGA dropdown
+│   │       ├── category-select.tsx            # Category selector
+│   │       ├── pricing-input.tsx              # Pricing type & amount input
+│   │       ├── loading-spinner.tsx            # Loading spinner
+│   │       ├── empty-state.tsx                # Empty state display
+│   │       ├── error-display.tsx              # Error display
+│   │       ├── confirm-dialog.tsx             # Confirmation dialog
+│   │       ├── pagination-controls.tsx        # Pagination controls
+│   │       ├── status-badge.tsx               # Status badges
+│   │       ├── date-display.tsx               # Date formatting display
+│   │       ├── back-button.tsx                # Back navigation button
+│   │       ├── page-header.tsx                # Consistent page headers
+│   │       └── seo-head.tsx                   # SEO meta tags
+│   │
+│   ├── lib/                                   # Utility libraries
+│   │   ├── api/                               # API client
+│   │   │   ├── client.ts                      # Axios instance with interceptors
+│   │   │   ├── auth.api.ts                    # Auth API calls
+│   │   │   ├── members.api.ts                 # Members API calls
+│   │   │   ├── products.api.ts                # Products API calls
+│   │   │   ├── services.api.ts                # Services API calls
+│   │   │   ├── tools.api.ts                   # Tools API calls
+│   │   │   ├── certificates.api.ts            # Certificates API calls
+│   │   │   ├── ratings.api.ts                 # Ratings API calls
+│   │   │   ├── transactions.api.ts            # Transactions API calls
+│   │   │   ├── about.api.ts                   # About content API calls
+│   │   │   ├── sponsors.api.ts                # Sponsors API calls
+│   │   │   ├── testimonials.api.ts            # Testimonials API calls
+│   │   │   ├── events.api.ts                  # Events API calls
+│   │   │   ├── categories.api.ts              # Categories API calls
+│   │   │   ├── notifications.api.ts           # Notifications API calls
+│   │   │   ├── search.api.ts                  # Search API calls
+│   │   │   ├── upload.api.ts                  # File upload API calls
+│   │   │   ├── location.api.ts                # States/LGAs API calls
+│   │   │   ├── admin.api.ts                   # Admin-specific API calls
+│   │   │   └── settings.api.ts                # Settings API calls
+│   │   │
+│   │   ├── utils.ts                           # General utility functions
+│   │   ├── constants.ts                       # Frontend constants
+│   │   ├── validations.ts                     # Zod validation schemas
+│   │   └── format.ts                          # Formatting helpers
+│   │
+│   ├── hooks/                                 # Custom React hooks
+│   │   ├── use-auth.ts                        # Authentication hook
+│   │   ├── use-current-user.ts                # Get current user data
+│   │   ├── use-members.ts                     # Members data hook
+│   │   ├── use-products.ts                    # Products data hook
+│   │   ├── use-services.ts                    # Services data hook
+│   │   ├── use-tools.ts                       # Tools data hook
+│   │   ├── use-categories.ts                  # Categories data hook
+│   │   ├── use-ratings.ts                     # Ratings data hook
+│   │   ├── use-notifications.ts               # Notifications hook
+│   │   ├── use-upload.ts                      # File upload hook
+│   │   ├── use-search.ts                      # Search hook
+│   │   ├── use-location.ts                    # States/LGAs hook
+│   │   ├── use-pagination.ts                  # Pagination hook
+│   │   ├── use-debounce.ts                    # Debounce hook
+│   │   ├── use-media-query.ts                 # Responsive hook
+│   │   └── use-local-storage.ts               # Local storage hook
+│   │
+│   ├── store/                                 # Zustand state stores
+│   │   ├── auth-store.ts                      # Authentication state
+│   │   ├── notification-store.ts              # Notification state
+│   │   ├── search-store.ts                    # Search state
+│   │   └── ui-store.ts                        # UI state (sidebar, modals)
+│   │
+│   ├── providers/                             # React context providers
+│   │   ├── query-provider.tsx                 # React Query provider
+│   │   ├── auth-provider.tsx                  # Auth context provider
+│   │   └── toast-provider.tsx                 # Toast notification provider
+│   │
+│   └── types/                                 # TypeScript type definitions
+│       ├── index.ts                           # Main types export
+│       ├── user.types.ts                      # User-related types
+│       ├── member.types.ts                    # Member types
+│       ├── product.types.ts                   # Product types
+│       ├── service.types.ts                   # Service types
+│       ├── tool.types.ts                      # Tool types
+│       ├── certificate.types.ts               # Certificate types
+│       ├── rating.types.ts                    # Rating types
+│       ├── transaction.types.ts               # Transaction types
+│       ├── category.types.ts                  # Category types
+│       ├── about.types.ts                     # About page types
+│       ├── event.types.ts                     # Event types
+│       ├── sponsor.types.ts                   # Sponsor types
+│       ├── testimonial.types.ts               # Testimonial types
+│       ├── notification.types.ts              # Notification types
+│       ├── admin.types.ts                     # Admin types
+│       └── api.types.ts                       # API response types
+│
+├── .env.local                                 # Local environment variables
+├── .env.example                               # Example env file
+├── .eslintrc.json                             # ESLint config
+├── .gitignore                                 # Git ignore
+├── components.json                            # shadcn/ui config
+├── next.config.js                             # Next.js configuration
+├── postcss.config.js                          # PostCSS config
+├── tailwind.config.ts                         # Tailwind configuration
+├── tsconfig.json                              # TypeScript config
+├── vercel.json                                # Vercel deployment config
+└── README.md                                  # Documentation
