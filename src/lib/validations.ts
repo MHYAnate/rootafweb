@@ -129,6 +129,17 @@ export const adminLoginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
+
+export const adminCreateSchema = z.object({
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  fullName: z.string().min(2, 'Full name is required'),
+  phoneNumber: z.string().optional(),
+  email: z.string().email().optional().or(z.literal('')),
+  role: z.enum(['SUPER_ADMIN', 'VERIFICATION_ADMIN', 'CONTENT_ADMIN', 'REPORT_ADMIN']),
+});
+
+export type AdminCreateFormData = z.infer<typeof adminCreateSchema>;
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type MemberRegisterFormData = z.infer<typeof memberRegisterSchema>;
 export type ClientRegisterFormData = z.infer<typeof clientRegisterSchema>;

@@ -1,0 +1,4440 @@
+[file name]: flow.txt
+[file content begin]
+PHASE 1: CORE CONFIGURATION & PROVIDERS
+1.1 src/app/globals.css
+CSS
+
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 142 70% 45%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 203 90% 60%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 45 90% 55%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 142 70% 45%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 142 70% 55%;
+    --primary-foreground: 144.9 80.4% 10%;
+    --secondary: 203 70% 40%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 45 70% 45%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 142 70% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  .page-header {
+    @apply mb-8;
+  }
+  .page-title {
+    @apply text-3xl font-bold tracking-tight;
+  }
+  .page-description {
+    @apply text-muted-foreground mt-2;
+  }
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
+  }
+  .link-primary {
+    @apply text-primary hover:text-primary/80 transition-colors;
+  }
+  .badge-status {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Phone input override */
+.PhoneInputInput {
+  @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+}
+1.2 src/app/layout.tsx
+React
+
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { Providers } from '@/providers';
+
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Uplifting Root Artisan Farmers Development Foundation',
+    template: '%s | URAFD',
+  },
+  description:
+    'Empowering artisan farmers across Nigeria through skills development, market access, and community support.',
+  keywords: ['farmers', 'artisans', 'Nigeria', 'agriculture', 'craftsmanship', 'foundation', 'marketplace'],
+  authors: [{ name: 'URAFD' }],
+  openGraph: {
+    type: 'website',
+    locale: 'en_NG',
+    siteName: 'URAFD',
+    title: 'Uplifting Root Artisan Farmers Development Foundation',
+    description: 'Empowering artisan farmers across Nigeria',
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
+}
+1.3 src/providers/index.tsx
+React
+
+'use client';
+
+import { ReactNode } from 'react';
+import { QueryProvider } from './query-provider';
+import { AuthProvider } from './auth-provider';
+import { ToastProvider } from './toast-provider';
+
+export function Providers({ children }: { children: ReactNode }) {
+  return (
+    <QueryProvider>
+      <AuthProvider>
+        <ToastProvider />
+        {children}
+      </AuthProvider>
+    </QueryProvider>
+  );
+}
+1.4 src/providers/query-provider.tsx
+React
+
+'use client';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState, ReactNode } from 'react';
+
+export function QueryProvider({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000,
+            retry: 2,
+            refetchOnWindowFocus: false,
+          },
+          mutations: {
+            retry: 0,
+          },
+        },
+      }),
+  );
+
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+}
+1.5 src/providers/auth-provider.tsx
+React
+
+'use client';
+
+import { createContext, useContext, useEffect, ReactNode } from 'react';
+import { useAuthStore } from '@/store/auth-store';
+
+interface AuthContextType {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  user: any;
+  isAdmin: boolean;
+}
+
+const AuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
+  isLoading: true,
+  user: null,
+  isAdmin: false,
+});
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const { user, isAuthenticated, isLoading, checkAuth } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        isLoading,
+        user,
+        isAdmin: user?.userType === 'ADMIN',
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => useContext(AuthContext);
+1.6 src/providers/toast-provider.tsx
+React
+
+'use client';
+
+import { Toaster } from 'sonner';
+
+export function ToastProvider() {
+  return (
+    <Toaster
+      position="top-right"
+      richColors
+      closeButton
+      duration={4000}
+      toastOptions={{
+        style: { fontSize: '14px' },
+      }}
+    />
+  );
+}
+PHASE 2: STATE MANAGEMENT (Zustand Stores)
+2.1 src/store/auth-store.ts
+TypeScript
+
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { jwtDecode } from 'jwt-decode';
+
+interface User {
+  id: string;
+  phoneNumber: string;
+  fullName: string;
+  email?: string;
+  userType: 'MEMBER' | 'CLIENT' | 'ADMIN';
+  verificationStatus: string;
+}
+
+interface AuthState {
+  user: User | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+
+  setAuth: (user: User, accessToken: string, refreshToken: string) => void;
+  setUser: (user: User) => void;
+  logout: () => void;
+  checkAuth: () => void;
+  getToken: () => string | null;
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      accessToken: null,
+      refreshToken: null,
+      isAuthenticated: false,
+      isLoading: true,
+
+      setAuth: (user, accessToken, refreshToken) => {
+        set({ user, accessToken, refreshToken, isAuthenticated: true, isLoading: false });
+      },
+
+      setUser: (user) => {
+        set({ user });
+      },
+
+      logout: () => {
+        set({
+          user: null,
+          accessToken: null,
+          refreshToken: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+      },
+
+      checkAuth: () => {
+        const { accessToken } = get();
+        if (!accessToken) {
+          set({ isLoading: false, isAuthenticated: false });
+          return;
+        }
+        try {
+          const decoded: any = jwtDecode(accessToken);
+          if (decoded.exp * 1000 < Date.now()) {
+            get().logout();
+          } else {
+            set({ isLoading: false, isAuthenticated: true });
+          }
+        } catch {
+          get().logout();
+        }
+      },
+
+      getToken: () => get().accessToken,
+    }),
+    {
+      name: 'urafd-auth',
+      storage: createJSONStorage(() => {
+        if (typeof window !== 'undefined') return localStorage;
+        return {
+          getItem: () => null,
+          setItem: () => {},
+          removeItem: () => {},
+        };
+      }),
+      partialize: (state) => ({
+        user: state.user,
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    },
+  ),
+);
+2.2 src/store/admin-auth-store.ts
+TypeScript
+
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { jwtDecode } from 'jwt-decode';
+
+interface AdminUser {
+  id: string;
+  username: string;
+  fullName: string;
+  role: string;
+  mustChangePassword: boolean;
+  permissions: {
+    canVerifyMembers: boolean;
+    canVerifyClients: boolean;
+    canResetPasswords: boolean;
+    canManageContent: boolean;
+    canManageEvents: boolean;
+    canManageAdmins: boolean;
+    canExportData: boolean;
+    canAccessReports: boolean;
+  };
+}
+
+interface AdminAuthState {
+  admin: AdminUser | null;
+  accessToken: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  setAuth: (admin: AdminUser, accessToken: string) => void;
+  logout: () => void;
+  checkAuth: () => void;
+  hasPermission: (permission: string) => boolean;
+}
+
+export const useAdminAuthStore = create<AdminAuthState>()(
+  persist(
+    (set, get) => ({
+      admin: null,
+      accessToken: null,
+      isAuthenticated: false,
+      isLoading: true,
+
+      setAuth: (admin, accessToken) => {
+        set({ admin, accessToken, isAuthenticated: true, isLoading: false });
+      },
+
+      logout: () => {
+        set({ admin: null, accessToken: null, isAuthenticated: false, isLoading: false });
+        if (typeof window !== 'undefined') {
+          window.location.href = '/admin/login';
+        }
+      },
+
+      checkAuth: () => {
+        const { accessToken } = get();
+        if (!accessToken) {
+          set({ isLoading: false, isAuthenticated: false });
+          return;
+        }
+        try {
+          const decoded: any = jwtDecode(accessToken);
+          if (decoded.exp * 1000 < Date.now()) {
+            get().logout();
+          } else {
+            set({ isLoading: false, isAuthenticated: true });
+          }
+        } catch {
+          get().logout();
+        }
+      },
+
+      hasPermission: (permission: string) => {
+        const { admin } = get();
+        if (!admin) return false;
+        if (admin.role === 'SUPER_ADMIN') return true;
+        return admin.permissions?.[permission] ?? false;
+      },
+    }),
+    {
+      name: 'urafd-admin-auth',
+      storage: createJSONStorage(() => {
+        if (typeof window !== 'undefined') return localStorage;
+        return { getItem: () => null, setItem: () => {}, removeItem: () => {} };
+      }),
+      partialize: (state) => ({
+        admin: state.admin,
+        accessToken: state.accessToken,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    },
+  ),
+);
+2.3 src/store/ui-store.ts
+TypeScript
+
+import { create } from 'zustand';
+
+interface UIState {
+  sidebarOpen: boolean;
+  mobileMenuOpen: boolean;
+  searchOpen: boolean;
+  toggleSidebar: () => void;
+  toggleMobileMenu: () => void;
+  toggleSearch: () => void;
+  closeMobileMenu: () => void;
+}
+
+export const useUIStore = create<UIState>((set) => ({
+  sidebarOpen: true,
+  mobileMenuOpen: false,
+  searchOpen: false,
+  toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
+  toggleMobileMenu: () => set((s) => ({ mobileMenuOpen: !s.mobileMenuOpen })),
+  toggleSearch: () => set((s) => ({ searchOpen: !s.searchOpen })),
+  closeMobileMenu: () => set({ mobileMenuOpen: false }),
+}));
+PHASE 3: API CLIENT & API MODULES
+3.1 src/lib/api/client.ts
+TypeScript
+
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { useAuthStore } from '@/store/auth-store';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
+export const apiClient = axios.create({
+  baseURL: API_URL,
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 30000,
+});
+
+apiClient.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    if (typeof window !== 'undefined') {
+      const token = useAuthStore.getState().accessToken;
+      if (token) config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError<any>) => {
+    if (error.response?.status === 401) {
+      const store = useAuthStore.getState();
+      if (store.refreshToken) {
+        try {
+          const res = await axios.post(`${API_URL}/auth/refresh`, {
+            refreshToken: store.refreshToken,
+          });
+          const { accessToken, refreshToken } = res.data.data;
+          store.setAuth(store.user!, accessToken, refreshToken);
+          if (error.config) {
+            error.config.headers.Authorization = `Bearer ${accessToken}`;
+            return apiClient(error.config);
+          }
+        } catch {
+          store.logout();
+        }
+      } else {
+        store.logout();
+      }
+    }
+    return Promise.reject(error);
+  },
+);
+
+// Admin API client
+export const adminApiClient = axios.create({
+  baseURL: API_URL,
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 30000,
+});
+
+adminApiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  if (typeof window !== 'undefined') {
+    const { useAdminAuthStore } = require('@/store/admin-auth-store');
+    const token = useAdminAuthStore.getState().accessToken;
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+adminApiClient.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      const { useAdminAuthStore } = require('@/store/admin-auth-store');
+      useAdminAuthStore.getState().logout();
+    }
+    return Promise.reject(error);
+  },
+);
+3.2 src/lib/api/auth.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const authApi = {
+  registerMember: (data: any) => apiClient.post('/auth/register/member', data).then((r) => r.data),
+  registerClient: (data: any) => apiClient.post('/auth/register/client', data).then((r) => r.data),
+  login: (data: { phoneNumber: string; password: string }) => apiClient.post('/auth/login', data).then((r) => r.data),
+  getProfile: () => apiClient.get('/auth/profile').then((r) => r.data),
+  changePassword: (data: { currentPassword: string; newPassword: string }) => apiClient.post('/auth/change-password', data).then((r) => r.data),
+  requestPasswordReset: (data: { phoneNumber: string; reason?: string }) => apiClient.post('/auth/request-password-reset', data).then((r) => r.data),
+};
+3.3 src/lib/api/members.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const membersApi = {
+  getAll: (params?: any) => apiClient.get('/members', { params }).then((r) => r.data),
+  getById: (id: string) => apiClient.get(`/members/${id}`).then((r) => r.data),
+  getMyProfile: () => apiClient.get('/members/me/profile').then((r) => r.data),
+  updateProfile: (data: any) => apiClient.put('/members/me/profile', data).then((r) => r.data),
+  addSpecialization: (data: any) => apiClient.post('/members/me/specializations', data).then((r) => r.data),
+  removeSpecialization: (id: string) => apiClient.delete(`/members/me/specializations/${id}`).then((r) => r.data),
+};
+3.4 src/lib/api/products.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const productsApi = {
+  getAll: (params?: any) => apiClient.get('/products', { params }).then((r) => r.data),
+  getById: (id: string) => apiClient.get(`/products/${id}`).then((r) => r.data),
+  getMyProducts: (params?: any) => apiClient.get('/products/me/list', { params }).then((r) => r.data),
+  create: (data: any) => apiClient.post('/products', data).then((r) => r.data),
+  update: (id: string, data: any) => apiClient.put(`/products/${id}`, data).then((r) => r.data),
+  delete: (id: string) => apiClient.delete(`/products/${id}`).then((r) => r.data),
+  addImage: (id: string, data: any) => apiClient.post(`/products/${id}/images`, data).then((r) => r.data),
+  removeImage: (productId: string, imageId: string) => apiClient.delete(`/products/${productId}/images/${imageId}`).then((r) => r.data),
+};
+3.5 src/lib/api/services.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const servicesApi = {
+  getAll: (params?: any) => apiClient.get('/services', { params }).then((r) => r.data),
+  getById: (id: string) => apiClient.get(`/services/${id}`).then((r) => r.data),
+  getMyServices: (params?: any) => apiClient.get('/services/me/list', { params }).then((r) => r.data),
+  create: (data: any) => apiClient.post('/services', data).then((r) => r.data),
+  update: (id: string, data: any) => apiClient.put(`/services/${id}`, data).then((r) => r.data),
+  delete: (id: string) => apiClient.delete(`/services/${id}`).then((r) => r.data),
+  addImage: (id: string, data: any) => apiClient.post(`/services/${id}/images`, data).then((r) => r.data),
+};
+3.6 src/lib/api/tools.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const toolsApi = {
+  getAll: (params?: any) => apiClient.get('/tools', { params }).then((r) => r.data),
+  getById: (id: string) => apiClient.get(`/tools/${id}`).then((r) => r.data),
+  getMyTools: (params?: any) => apiClient.get('/tools/me/list', { params }).then((r) => r.data),
+  create: (data: any) => apiClient.post('/tools', data).then((r) => r.data),
+  update: (id: string, data: any) => apiClient.put(`/tools/${id}`, data).then((r) => r.data),
+  delete: (id: string) => apiClient.delete(`/tools/${id}`).then((r) => r.data),
+  addImage: (id: string, data: any) => apiClient.post(`/tools/${id}/images`, data).then((r) => r.data),
+};
+3.7 src/lib/api/categories.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const categoriesApi = {
+  getAll: (type?: string) => apiClient.get('/categories', { params: { type } }).then((r) => r.data),
+  getByType: (type: string) => apiClient.get(`/categories/type/${type}`).then((r) => r.data),
+  getById: (id: string) => apiClient.get(`/categories/${id}`).then((r) => r.data),
+};
+3.8 src/lib/api/ratings.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const ratingsApi = {
+  getByMember: (memberId: string, params?: any) => apiClient.get(`/ratings/member/${memberId}`, { params }).then((r) => r.data),
+  create: (data: any) => apiClient.post('/ratings', data).then((r) => r.data),
+  getMyGiven: () => apiClient.get('/ratings/me/given').then((r) => r.data),
+  getMyReceived: (params?: any) => apiClient.get('/ratings/me/received', { params }).then((r) => r.data),
+};
+3.9 src/lib/api/upload.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const uploadApi = {
+  uploadImage: (file: File, folder: string = 'general') => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiClient.post(`/upload/image?folder=${folder}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data);
+  },
+  uploadImages: (files: File[], folder: string = 'general') => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    return apiClient.post(`/upload/images?folder=${folder}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data);
+  },
+};
+3.10 src/lib/api/location.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const locationApi = {
+  getStates: () => apiClient.get('/location/states').then((r) => r.data),
+  getLgasByState: (stateId: string) => apiClient.get(`/location/states/${stateId}/lgas`).then((r) => r.data),
+  getLgasByName: (state: string) => apiClient.get('/location/lgas', { params: { state } }).then((r) => r.data),
+};
+3.11 src/lib/api/about.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const aboutApi = {
+  getAll: () => apiClient.get('/about').then((r) => r.data),
+};
+3.12 src/lib/api/events.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const eventsApi = {
+  getAll: (params?: any) => apiClient.get('/events', { params }).then((r) => r.data),
+  getById: (id: string) => apiClient.get(`/events/${id}`).then((r) => r.data),
+};
+3.13 src/lib/api/search.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const searchApi = {
+  search: (q: string, type?: string, page?: number) =>
+    apiClient.get('/search', { params: { q, type, page } }).then((r) => r.data),
+};
+3.14 src/lib/api/notifications.api.ts
+TypeScript
+
+import { apiClient } from './client';
+
+export const notificationsApi = {
+  getAll: (params?: any) => apiClient.get('/notifications', { params }).then((r) => r.data),
+  getUnreadCount: () => apiClient.get('/notifications/unread-count').then((r) => r.data),
+  markAsRead: (id: string) => apiClient.patch(`/notifications/${id}/read`).then((r) => r.data),
+  markAllAsRead: () => apiClient.patch('/notifications/read-all').then((r) => r.data),
+};
+3.15 src/lib/api/admin.api.ts
+TypeScript
+
+import { adminApiClient } from './client';
+
+export const adminApi = {
+  // Auth
+  login: (data: { username: string; password: string }) => adminApiClient.post('/admin/auth/login', data).then((r) => r.data),
+  getProfile: () => adminApiClient.get('/admin/auth/profile').then((r) => r.data),
+  changePassword: (data: any) => adminApiClient.post('/admin/auth/change-password', data).then((r) => r.data),
+  createAdmin: (data: any) => adminApiClient.post('/admin/auth/create', data).then((r) => r.data),
+  getAllAdmins: () => adminApiClient.get('/admin/auth/all').then((r) => r.data),
+  toggleAdminStatus: (id: string) => adminApiClient.patch(`/admin/auth/${id}/toggle-status`).then((r) => r.data),
+
+  // Dashboard
+  getDashboard: () => adminApiClient.get('/admin/dashboard').then((r) => r.data),
+  getActivityLog: (params?: any) => adminApiClient.get('/admin/dashboard/activity-log', { params }).then((r) => r.data),
+
+  // Verification
+  getPendingVerifications: (params?: any) => adminApiClient.get('/admin/verification/pending', { params }).then((r) => r.data),
+  getVerificationDetail: (userId: string) => adminApiClient.get(`/admin/verification/user/${userId}`).then((r) => r.data),
+  startReview: (userId: string) => adminApiClient.post(`/admin/verification/user/${userId}/start-review`).then((r) => r.data),
+  approveUser: (userId: string, notes?: string) => adminApiClient.post(`/admin/verification/user/${userId}/approve`, { notes }).then((r) => r.data),
+  rejectUser: (userId: string, data: { reason: string; details: string }) => adminApiClient.post(`/admin/verification/user/${userId}/reject`, data).then((r) => r.data),
+  requestResubmission: (userId: string, data: { reason: string; documentIds?: string[] }) => adminApiClient.post(`/admin/verification/user/${userId}/request-resubmission`, data).then((r) => r.data),
+  suspendUser: (userId: string, reason: string) => adminApiClient.post(`/admin/verification/user/${userId}/suspend`, { reason }).then((r) => r.data),
+  reactivateUser: (userId: string) => adminApiClient.post(`/admin/verification/user/${userId}/reactivate`).then((r) => r.data),
+  resetUserPassword: (userId: string, newPassword: string) => adminApiClient.post(`/admin/verification/user/${userId}/reset-password`, { newPassword }).then((r) => r.data),
+  getVerificationStats: () => adminApiClient.get('/admin/verification/stats').then((r) => r.data),
+
+  // Password Resets
+  getPendingResets: (params?: any) => adminApiClient.get('/admin/verification/password-resets', { params }).then((r) => r.data),
+  processReset: (id: string, data: { temporaryPassword: string; notes?: string }) => adminApiClient.post(`/admin/verification/password-resets/${id}/process`, data).then((r) => r.data),
+
+  // Users
+  getUsers: (params?: any) => adminApiClient.get('/admin/users', { params }).then((r) => r.data),
+  getUserById: (id: string) => adminApiClient.get(`/admin/users/${id}`).then((r) => r.data),
+
+  // Listings
+  toggleListingFeatured: (type: string, id: string) => adminApiClient.patch(`/admin/dashboard/listings/${type}/${id}/feature`).then((r) => r.data),
+  deactivateListing: (type: string, id: string, reason: string) => adminApiClient.post(`/admin/dashboard/listings/${type}/${id}/deactivate`, { reason }).then((r) => r.data),
+  toggleMemberFeatured: (id: string) => adminApiClient.patch(`/admin/dashboard/members/${id}/feature`).then((r) => r.data),
+
+  // Ratings
+  getReportedRatings: (params?: any) => adminApiClient.get('/admin/dashboard/ratings/reported', { params }).then((r) => r.data),
+  moderateRating: (id: string, data: { action: string; notes?: string }) => adminApiClient.post(`/admin/dashboard/ratings/${id}/moderate`, data).then((r) => r.data),
+
+  // Content
+  updateAboutContent: (key: string, data: any) => adminApiClient.put(`/about/content/${key}`, data).then((r) => r.data),
+  createLeadership: (data: any) => adminApiClient.post('/about/leadership', data).then((r) => r.data),
+  updateLeadership: (id: string, data: any) => adminApiClient.put(`/about/leadership/${id}`, data).then((r) => r.data),
+  deleteLeadership: (id: string) => adminApiClient.delete(`/about/leadership/${id}`).then((r) => r.data),
+  createSponsor: (data: any) => adminApiClient.post('/sponsors', data).then((r) => r.data),
+  updateSponsor: (id: string, data: any) => adminApiClient.put(`/sponsors/${id}`, data).then((r) => r.data),
+  deleteSponsor: (id: string) => adminApiClient.delete(`/sponsors/${id}`).then((r) => r.data),
+  createTestimonial: (data: any) => adminApiClient.post('/testimonials', data).then((r) => r.data),
+  approveTestimonial: (id: string) => adminApiClient.patch(`/testimonials/${id}/approve`).then((r) => r.data),
+  createEvent: (data: any) => adminApiClient.post('/events', data).then((r) => r.data),
+  updateEvent: (id: string, data: any) => adminApiClient.put(`/events/${id}`, data).then((r) => r.data),
+  publishEvent: (id: string) => adminApiClient.patch(`/events/${id}/publish`).then((r) => r.data),
+
+  // Categories
+  createCategory: (data: any) => adminApiClient.post('/categories', data).then((r) => r.data),
+  updateCategory: (id: string, data: any) => adminApiClient.put(`/categories/${id}`, data).then((r) => r.data),
+  toggleCategory: (id: string) => adminApiClient.patch(`/categories/${id}/toggle`).then((r) => r.data),
+
+  // Announcements
+  getAnnouncements: (params?: any) => adminApiClient.get('/admin/dashboard/announcements', { params }).then((r) => r.data),
+  createAnnouncement: (data: any) => adminApiClient.post('/admin/dashboard/announcements', data).then((r) => r.data),
+
+  // Export
+  exportUsers: (params?: any) => adminApiClient.get('/admin/dashboard/export/users', { params }).then((r) => r.data),
+  exportTransactions: (params?: any) => adminApiClient.get('/admin/dashboard/export/transactions', { params }).then((r) => r.data),
+
+  // Settings
+  getSettings: () => adminApiClient.get('/settings').then((r) => r.data),
+  updateSetting: (key: string, value: string) => adminApiClient.put(`/settings/${key}`, { value }).then((r) => r.data),
+};
+PHASE 4: SHARED UTILITY LIBRARIES
+4.1 src/lib/utils.ts
+TypeScript
+
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+4.2 src/lib/constants.ts
+TypeScript
+
+export const APP_NAME = 'Uplifting Root Artisan Farmers Development Foundation';
+export const APP_SHORT_NAME = 'URAFD';
+
+export const VERIFICATION_STATUS_MAP: Record<string, { label: string; color: string }> = {
+  PENDING: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
+  UNDER_REVIEW: { label: 'Under Review', color: 'bg-blue-100 text-blue-800' },
+  VERIFIED: { label: 'Verified', color: 'bg-green-100 text-green-800' },
+  REJECTED: { label: 'Rejected', color: 'bg-red-100 text-red-800' },
+  SUSPENDED: { label: 'Suspended', color: 'bg-gray-100 text-gray-800' },
+  RESUBMITTED: { label: 'Resubmitted', color: 'bg-orange-100 text-orange-800' },
+};
+
+export const PROVIDER_TYPE_MAP: Record<string, string> = {
+  FARMER: 'Farmer',
+  ARTISAN: 'Artisan',
+  BOTH: 'Farmer & Artisan',
+};
+
+export const PRICING_TYPE_MAP: Record<string, string> = {
+  FIXED: 'Fixed Price',
+  NEGOTIABLE: 'Negotiable',
+  BOTH: 'Price (Negotiable)',
+};
+
+export const TOOL_CONDITION_MAP: Record<string, string> = {
+  NEW: 'New',
+  LIKE_NEW: 'Like New',
+  GOOD: 'Good',
+  FAIR: 'Fair',
+  FOR_PARTS: 'For Parts',
+};
+
+export const TOOL_PURPOSE_MAP: Record<string, string> = {
+  FOR_SALE: 'For Sale',
+  FOR_LEASE: 'For Lease',
+  BOTH: 'Sale & Lease',
+};
+
+export const NIGERIAN_STATES = [
+  'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue',
+  'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT',
+  'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi',
+  'Kwara', 'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo',
+  'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara',
+];
+4.3 src/lib/format.ts
+TypeScript
+
+export function formatCurrency(amount: number | null | undefined, currency: string = 'NGN'): string {
+  if (amount == null) return 'N/A';
+  return new Intl.NumberFormat('en-NG', { style: 'currency', currency }).format(amount);
+}
+
+export function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return 'N/A';
+  return new Intl.DateTimeFormat('en-NG', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(new Date(date));
+}
+
+export function formatDateTime(date: string | Date | null | undefined): string {
+  if (!date) return 'N/A';
+  return new Intl.DateTimeFormat('en-NG', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(date));
+}
+
+export function formatRelativeTime(date: string | Date): string {
+  const now = new Date();
+  const d = new Date(date);
+  const diff = now.getTime() - d.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  return formatDate(date);
+}
+
+export function formatPhoneNumber(phone: string): string {
+  if (!phone) return '';
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.startsWith('234')) {
+    return `+${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6, 9)} ${cleaned.slice(9)}`;
+  }
+  return phone;
+}
+
+export function truncate(str: string, length: number = 100): string {
+  if (!str) return '';
+  return str.length > length ? `${str.slice(0, length)}...` : str;
+}
+4.4 src/lib/validations.ts
+TypeScript
+
+import { z } from 'zod';
+
+export const loginSchema = z.object({
+  phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits').max(15),
+  password: z.string().min(1, 'Password is required'),
+});
+
+export const memberRegisterSchema = z.object({
+  phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits'),
+  fullName: z.string().min(2, 'Full name must be at least 2 characters').max(150),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirmPassword: z.string(),
+  providerType: z.enum(['FARMER', 'ARTISAN', 'BOTH']),
+  address: z.string().min(5, 'Address is required'),
+  localGovernmentArea: z.string().min(2, 'LGA is required'),
+  state: z.string().min(2, 'State is required'),
+  email: z.string().email().optional().or(z.literal('')),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
+});
+
+export const clientRegisterSchema = z.object({
+  phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits'),
+  fullName: z.string().min(2, 'Full name is required').max(150),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirmPassword: z.string(),
+  state: z.string().optional(),
+  localGovernmentArea: z.string().optional(),
+  email: z.string().email().optional().or(z.literal('')),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z.string().min(8, 'New password must be at least 8 characters'),
+  confirmPassword: z.string(),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
+});
+
+export const productSchema = z.object({
+  name: z.string().min(2, 'Product name is required'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  categoryId: z.string().min(1, 'Category is required'),
+  unitOfMeasure: z.string().min(1, 'Unit is required'),
+  pricingType: z.enum(['FIXED', 'NEGOTIABLE', 'BOTH']),
+  priceAmount: z.number().optional(),
+  pricePerUnit: z.string().optional(),
+  availability: z.enum(['AVAILABLE', 'OUT_OF_STOCK', 'SEASONAL', 'LIMITED_STOCK']).optional(),
+});
+
+export const serviceSchema = z.object({
+  name: z.string().min(2, 'Service name is required'),
+  description: z.string().min(10, 'Description is required'),
+  categoryId: z.string().min(1, 'Category is required'),
+  pricingType: z.enum(['FIXED', 'NEGOTIABLE', 'BOTH']),
+  startingPrice: z.number().optional(),
+  priceBasis: z.string().optional(),
+});
+
+export const ratingSchema = z.object({
+  memberId: z.string(),
+  ratingCategory: z.enum(['PRODUCT_RATING', 'SERVICE_RATING', 'TOOL_LEASE_RATING', 'OVERALL_MEMBER']),
+  overallRating: z.number().min(1).max(5),
+  reviewText: z.string().max(500).optional(),
+});
+
+export const adminLoginSchema = z.object({
+  username: z.string().min(1, 'Username is required'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+export type LoginFormData = z.infer<typeof loginSchema>;
+export type MemberRegisterFormData = z.infer<typeof memberRegisterSchema>;
+export type ClientRegisterFormData = z.infer<typeof clientRegisterSchema>;
+export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+export type ProductFormData = z.infer<typeof productSchema>;
+export type ServiceFormData = z.infer<typeof serviceSchema>;
+export type RatingFormData = z.infer<typeof ratingSchema>;
+export type AdminLoginFormData = z.infer<typeof adminLoginSchema>;
+PHASE 5: CUSTOM HOOKS
+5.1 src/hooks/use-auth.ts
+TypeScript
+
+'use client';
+
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { authApi } from '@/lib/api/auth.api';
+import { useAuthStore } from '@/store/auth-store';
+
+export function useLogin() {
+  const router = useRouter();
+  const { setAuth } = useAuthStore();
+
+  return useMutation({
+    mutationFn: authApi.login,
+    onSuccess: (response) => {
+      const { accessToken, refreshToken, user } = response.data;
+      setAuth(user, accessToken, refreshToken);
+      toast.success('Login successful!');
+
+      if (user.verificationStatus === 'PENDING' || user.verificationStatus === 'REJECTED') {
+        router.push('/verification-pending');
+      } else {
+        router.push('/dashboard');
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Login failed');
+    },
+  });
+}
+
+export function useRegisterMember() {
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: authApi.registerMember,
+    onSuccess: () => {
+      toast.success('Registration successful! Awaiting admin verification.');
+      router.push('/verification-pending');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Registration failed');
+    },
+  });
+}
+
+export function useRegisterClient() {
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: authApi.registerClient,
+    onSuccess: () => {
+      toast.success('Registration successful! Awaiting admin verification.');
+      router.push('/verification-pending');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Registration failed');
+    },
+  });
+}
+
+export function useProfile() {
+  return useQuery({
+    queryKey: ['profile'],
+    queryFn: authApi.getProfile,
+    enabled: useAuthStore.getState().isAuthenticated,
+  });
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: authApi.changePassword,
+    onSuccess: () => toast.success('Password changed successfully'),
+    onError: (error: any) => toast.error(error.response?.data?.message || 'Failed to change password'),
+  });
+}
+5.2 src/hooks/use-members.ts
+TypeScript
+
+'use client';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { membersApi } from '@/lib/api/members.api';
+
+export function useMembers(params?: any) {
+  return useQuery({
+    queryKey: ['members', params],
+    queryFn: () => membersApi.getAll(params),
+  });
+}
+
+export function useMember(id: string) {
+  return useQuery({
+    queryKey: ['member', id],
+    queryFn: () => membersApi.getById(id),
+    enabled: !!id,
+  });
+}
+
+export function useMyProfile() {
+  return useQuery({
+    queryKey: ['my-profile'],
+    queryFn: membersApi.getMyProfile,
+  });
+}
+
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: membersApi.updateProfile,
+    onSuccess: () => {
+      toast.success('Profile updated');
+      queryClient.invalidateQueries({ queryKey: ['my-profile'] });
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Update failed'),
+  });
+}
+5.3 src/hooks/use-products.ts
+TypeScript
+
+'use client';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { productsApi } from '@/lib/api/products.api';
+
+export function useProducts(params?: any) {
+  return useQuery({
+    queryKey: ['products', params],
+    queryFn: () => productsApi.getAll(params),
+  });
+}
+
+export function useProduct(id: string) {
+  return useQuery({
+    queryKey: ['product', id],
+    queryFn: () => productsApi.getById(id),
+    enabled: !!id,
+  });
+}
+
+export function useMyProducts(params?: any) {
+  return useQuery({
+    queryKey: ['my-products', params],
+    queryFn: () => productsApi.getMyProducts(params),
+  });
+}
+
+export function useCreateProduct() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: productsApi.create,
+    onSuccess: () => {
+      toast.success('Product created');
+      qc.invalidateQueries({ queryKey: ['my-products'] });
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+export function useUpdateProduct() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => productsApi.update(id, data),
+    onSuccess: () => {
+      toast.success('Product updated');
+      qc.invalidateQueries({ queryKey: ['my-products'] });
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+export function useDeleteProduct() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: productsApi.delete,
+    onSuccess: () => {
+      toast.success('Product deleted');
+      qc.invalidateQueries({ queryKey: ['my-products'] });
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+5.4 src/hooks/use-categories.ts
+TypeScript
+
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { categoriesApi } from '@/lib/api/categories.api';
+
+export function useCategories(type?: string) {
+  return useQuery({
+    queryKey: ['categories', type],
+    queryFn: () => categoriesApi.getAll(type),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useCategoriesByType(type: string) {
+  return useQuery({
+    queryKey: ['categories', 'type', type],
+    queryFn: () => categoriesApi.getByType(type),
+    staleTime: 5 * 60 * 1000,
+    enabled: !!type,
+  });
+}
+5.5 src/hooks/use-upload.ts
+TypeScript
+
+'use client';
+
+import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { uploadApi } from '@/lib/api/upload.api';
+
+export function useUploadImage() {
+  const [uploading, setUploading] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: ({ file, folder }: { file: File; folder: string }) => {
+      setUploading(true);
+      return uploadApi.uploadImage(file, folder);
+    },
+    onSuccess: () => setUploading(false),
+    onError: (e: any) => {
+      setUploading(false);
+      toast.error(e.response?.data?.message || 'Upload failed');
+    },
+  });
+
+  return { ...mutation, uploading };
+}
+5.6 src/hooks/use-location.ts
+TypeScript
+
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { locationApi } from '@/lib/api/location.api';
+
+export function useStates() {
+  return useQuery({
+    queryKey: ['states'],
+    queryFn: locationApi.getStates,
+    staleTime: 60 * 60 * 1000,
+  });
+}
+
+export function useLgas(stateName: string) {
+  return useQuery({
+    queryKey: ['lgas', stateName],
+    queryFn: () => locationApi.getLgasByName(stateName),
+    enabled: !!stateName,
+    staleTime: 60 * 60 * 1000,
+  });
+}
+5.7 src/hooks/use-debounce.ts
+TypeScript
+
+'use client';
+
+import { useState, useEffect } from 'react';
+
+export function useDebounce<T>(value: T, delay: number = 500): T {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debounced;
+}
+5.8 src/hooks/use-pagination.ts
+TypeScript
+
+'use client';
+
+import { useState, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+
+export function usePagination(defaultLimit: number = 12) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const page = Number(searchParams.get('page')) || 1;
+  const limit = Number(searchParams.get('limit')) || defaultLimit;
+
+  const setPage = useCallback(
+    (newPage: number) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('page', String(newPage));
+      router.push(`?${params.toString()}`);
+    },
+    [searchParams, router],
+  );
+
+  return { page, limit, setPage };
+}
+PHASE 6: SHARED COMPONENTS
+6.1 src/components/shared/loading-spinner.tsx
+React
+
+import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface Props {
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+  text?: string;
+}
+
+export function LoadingSpinner({ size = 'md', className, text }: Props) {
+  const sizeMap = { sm: 'h-4 w-4', md: 'h-8 w-8', lg: 'h-12 w-12' };
+
+  return (
+    <div className={cn('flex flex-col items-center justify-center gap-2', className)}>
+      <Loader2 className={cn('animate-spin text-primary', sizeMap[size])} />
+      {text && <p className="text-sm text-muted-foreground">{text}</p>}
+    </div>
+  );
+}
+6.2 src/components/shared/empty-state.tsx
+React
+
+import { LucideIcon } from 'lucide-react';
+
+interface Props {
+  icon?: LucideIcon;
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+}
+
+export function EmptyState({ icon: Icon, title, description, action }: Props) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      {Icon && <Icon className="h-12 w-12 text-muted-foreground/50 mb-4" />}
+      <h3 className="text-lg font-semibold">{title}</h3>
+      {description && (
+        <p className="text-muted-foreground mt-1 max-w-sm">{description}</p>
+      )}
+      {action && <div className="mt-4">{action}</div>}
+    </div>
+  );
+}
+6.3 src/components/shared/page-header.tsx
+React
+
+interface Props {
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+}
+
+export function PageHeader({ title, description, action }: Props) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
+        {description && (
+          <p className="text-muted-foreground mt-1">{description}</p>
+        )}
+      </div>
+      {action && <div className="flex-shrink-0">{action}</div>}
+    </div>
+  );
+}
+6.4 src/components/shared/status-badge.tsx
+React
+
+import { cn } from '@/lib/utils';
+import { VERIFICATION_STATUS_MAP } from '@/lib/constants';
+
+interface Props {
+  status: string;
+  className?: string;
+}
+
+export function StatusBadge({ status, className }: Props) {
+  const config = VERIFICATION_STATUS_MAP[status] || {
+    label: status,
+    color: 'bg-gray-100 text-gray-800',
+  };
+
+  return (
+    <span
+      className={cn(
+        'badge-status',
+        config.color,
+        className,
+      )}
+    >
+      {config.label}
+    </span>
+  );
+}
+6.5 src/components/shared/pagination-controls.tsx
+React
+
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+interface Props {
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+  onPageChange: (page: number) => void;
+}
+
+export function PaginationControls({ meta, onPageChange }: Props) {
+  if (meta.totalPages <= 1) return null;
+
+  return (
+    <div className="flex items-center justify-between mt-8">
+      <p className="text-sm text-muted-foreground">
+        Showing {(meta.page - 1) * meta.limit + 1} to{' '}
+        {Math.min(meta.page * meta.limit, meta.total)} of {meta.total}
+      </p>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(meta.page - 1)}
+          disabled={!meta.hasPreviousPage}
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Previous
+        </Button>
+        <span className="text-sm px-2">
+          Page {meta.page} of {meta.totalPages}
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(meta.page + 1)}
+          disabled={!meta.hasNextPage}
+        >
+          Next
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+6.6 src/components/shared/confirm-dialog.tsx
+React
+
+'use client';
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+
+interface Props {
+  trigger: React.ReactNode;
+  title: string;
+  description: string;
+  onConfirm: () => void;
+  confirmText?: string;
+  destructive?: boolean;
+}
+
+export function ConfirmDialog({
+  trigger,
+  title,
+  description,
+  onConfirm,
+  confirmText = 'Confirm',
+  destructive = false,
+}: Props) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onConfirm}
+            className={destructive ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : ''}
+          >
+            {confirmText}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+6.7 src/components/shared/image-upload.tsx
+React
+
+'use client';
+
+import { useState, useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { Upload, X, Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
+import { useUploadImage } from '@/hooks/use-upload';
+
+interface Props {
+  onUploadComplete: (result: any) => void;
+  folder?: string;
+  currentImage?: string;
+  className?: string;
+  label?: string;
+}
+
+export function ImageUpload({
+  onUploadComplete,
+  folder = 'general',
+  currentImage,
+  className,
+  label = 'Upload Image',
+}: Props) {
+  const [preview, setPreview] = useState<string | null>(currentImage || null);
+  const { mutateAsync, uploading } = useUploadImage();
+
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
+
+      setPreview(URL.createObjectURL(file));
+
+      try {
+        const result = await mutateAsync({ file, folder });
+        onUploadComplete(result.data);
+      } catch {
+        setPreview(currentImage || null);
+      }
+    },
+    [mutateAsync, folder, onUploadComplete, currentImage],
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { 'image/*': ['.jpeg', '.jpg', '.png', '.webp'] },
+    maxSize: 5 * 1024 * 1024,
+    multiple: false,
+  });
+
+  return (
+    <div className={cn('space-y-2', className)}>
+      <label className="text-sm font-medium">{label}</label>
+      <div
+        {...getRootProps()}
+        className={cn(
+          'border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors',
+          isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50',
+          uploading && 'pointer-events-none opacity-50',
+        )}
+      >
+        <input {...getInputProps()} />
+        {uploading ? (
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">Uploading...</p>
+          </div>
+        ) : preview ? (
+          <div className="relative w-full aspect-video">
+            <Image
+              src={preview}
+              alt="Preview"
+              fill
+              className="object-contain rounded"
+            />
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2">
+            <Upload className="h-8 w-8 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              Drag & drop or click to upload
+            </p>
+            <p className="text-xs text-muted-foreground">
+              JPEG, PNG, WebP • Max 5MB
+            </p>
+          </div>
+        )}
+      </div>
+      {preview && !uploading && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setPreview(null);
+          }}
+          className="text-xs text-destructive hover:underline"
+        >
+          Remove image
+        </button>
+      )}
+    </div>
+  );
+}
+6.8 src/components/shared/state-lga-select.tsx
+React
+
+'use client';
+
+import { useStates, useLgas } from '@/hooks/use-location';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+
+interface Props {
+  state: string;
+  lga: string;
+  onStateChange: (state: string) => void;
+  onLgaChange: (lga: string) => void;
+}
+
+export function StateLgaSelect({ state, lga, onStateChange, onLgaChange }: Props) {
+  const { data: statesData } = useStates();
+  const { data: lgasData } = useLgas(state);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-2">
+        <Label>State *</Label>
+        <Select value={state} onValueChange={(v) => { onStateChange(v); onLgaChange(''); }}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select State" />
+          </SelectTrigger>
+          <SelectContent>
+            {statesData?.data?.map((s: any) => (
+              <SelectItem key={s.id} value={s.name}>
+                {s.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label>Local Government Area *</Label>
+        <Select value={lga} onValueChange={onLgaChange} disabled={!state}>
+          <SelectTrigger>
+            <SelectValue placeholder={state ? 'Select LGA' : 'Select state first'} />
+          </SelectTrigger>
+          <SelectContent>
+            {lgasData?.data?.map((l: any) => (
+              <SelectItem key={l.id} value={l.name}>
+                {l.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+6.9 src/components/shared/price-display.tsx
+React
+
+import { PRICING_TYPE_MAP } from '@/lib/constants';
+import { formatCurrency } from '@/lib/format';
+
+interface Props {
+  pricingType: string;
+  amount?: number | null;
+  displayText?: string | null;
+  className?: string;
+}
+
+export function PriceDisplay({ pricingType, amount, displayText, className }: Props) {
+  if (displayText) {
+    return <span className={className}>{displayText}</span>;
+  }
+
+  if (pricingType === 'NEGOTIABLE') {
+    return <span className={className}>Price Negotiable</span>;
+  }
+
+  if (amount) {
+    return (
+      <span className={className}>
+        {formatCurrency(amount)}
+        {pricingType === 'BOTH' && ' (Negotiable)'}
+      </span>
+    );
+  }
+
+  return <span className={className}>Contact for price</span>;
+}
+6.10 src/components/shared/rating-stars.tsx
+React
+
+import { Star } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface Props {
+  rating: number;
+  maxRating?: number;
+  size?: 'sm' | 'md' | 'lg';
+  showValue?: boolean;
+  totalRatings?: number;
+}
+
+export function RatingStars({
+  rating,
+  maxRating = 5,
+  size = 'md',
+  showValue = false,
+  totalRatings,
+}: Props) {
+  const sizeMap = { sm: 'h-3 w-3', md: 'h-4 w-4', lg: 'h-5 w-5' };
+
+  return (
+    <div className="flex items-center gap-1">
+      {Array.from({ length: maxRating }).map((_, i) => (
+        <Star
+          key={i}
+          className={cn(
+            sizeMap[size],
+            i < Math.round(rating)
+              ? 'fill-yellow-400 text-yellow-400'
+              : 'fill-gray-200 text-gray-200',
+          )}
+        />
+      ))}
+      {showValue && (
+        <span className="text-sm text-muted-foreground ml-1">
+          {Number(rating).toFixed(1)}
+          {totalRatings !== undefined && ` (${totalRatings})`}
+        </span>
+      )}
+    </div>
+  );
+}
+PHASE 7: LAYOUT COMPONENTS
+7.1 src/components/layout/header.tsx
+React
+
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Menu, X, Search, Bell, User, LogOut, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useAuthStore } from '@/store/auth-store';
+import { cn } from '@/lib/utils';
+
+const navLinks = [
+  { href: '/members', label: 'Members' },
+  { href: '/products', label: 'Products' },
+  { href: '/services', label: 'Services' },
+  { href: '/tools', label: 'Tools' },
+  { href: '/events', label: 'Events' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+
+export function Header() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuthStore();
+  const pathname = usePathname();
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <div className="container-custom flex h-16 items-center justify-between">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+            <span className="text-white font-bold text-sm">U</span>
+          </div>
+          <span className="text-xl font-bold text-primary hidden sm:block">URAFD</span>
+        </Link>
+
+        <nav className="hidden lg:flex items-center gap-6">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                'text-sm font-medium transition-colors hover:text-primary',
+                pathname === link.href ? 'text-primary' : 'text-muted-foreground',
+              )}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <Link href="/search">
+            <Button variant="ghost" size="icon">
+              <Search className="h-5 w-5" />
+            </Button>
+          </Link>
+
+          {isAuthenticated ? (
+            <>
+              <Link href="/notifications">
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="h-5 w-5" />
+                </Button>
+              </Link>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:block text-sm">
+                      {user?.fullName?.split(' ')[0]}
+                    </span>
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-medium">{user?.fullName}</p>
+                    <p className="text-xs text-muted-foreground">{user?.phoneNumber}</p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard">Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">My Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="text-destructive">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <div className="hidden sm:flex items-center gap-2">
+              <Link href="/login">
+                <Button variant="outline" size="sm">Login</Button>
+              </Link>
+              <Link href="/register">
+                <Button size="sm">Register</Button>
+              </Link>
+            </div>
+          )}
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
+      </div>
+
+      {mobileOpen && (
+        <div className="lg:hidden border-t bg-white p-4 space-y-3">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="block text-sm font-medium text-muted-foreground hover:text-primary py-2"
+              onClick={() => setMobileOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+          {!isAuthenticated && (
+            <div className="flex flex-col gap-2 pt-3 border-t">
+              <Link href="/login" onClick={() => setMobileOpen(false)}>
+                <Button variant="outline" className="w-full" size="sm">Login</Button>
+              </Link>
+              <Link href="/register" onClick={() => setMobileOpen(false)}>
+                <Button className="w-full" size="sm">Register</Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
+    </header>
+  );
+}
+7.2 src/components/layout/footer.tsx
+React
+
+import Link from 'next/link';
+import { Phone, Mail, MapPin } from 'lucide-react';
+
+export function Footer() {
+  return (
+    <footer className="bg-gray-900 text-gray-300">
+      <div className="container-custom py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+                <span className="text-white font-bold text-sm">U</span>
+              </div>
+              <span className="text-white text-lg font-bold">URAFD</span>
+            </div>
+            <p className="text-sm leading-relaxed">
+              Uplifting the Root Artisan Farmers Development Foundation.
+              Empowering artisan farmers across Nigeria through skills development
+              and market access.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="text-white font-semibold mb-4">Quick Links</h4>
+            <ul className="space-y-2 text-sm">
+              {[
+                { href: '/about', label: 'About Us' },
+                { href: '/members', label: 'Our Members' },
+                { href: '/products', label: 'Products' },
+                { href: '/services', label: 'Services' },
+                { href: '/tools', label: 'Tool Marketplace' },
+                { href: '/events', label: 'Events' },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="hover:text-white transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white font-semibold mb-4">For Members</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/register/member" className="hover:text-white">Join as Member</Link></li>
+              <li><Link href="/register/client" className="hover:text-white">Join as Client</Link></li>
+              <li><Link href="/login" className="hover:text-white">Login</Link></li>
+              <li><Link href="/faq" className="hover:text-white">FAQ</Link></li>
+              <li><Link href="/contact" className="hover:text-white">Contact Us</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white font-semibold mb-4">Contact</h4>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <span>Kaduna, Nigeria</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone className="h-4 w-4 flex-shrink-0" />
+                <span>+234 800 000 0000</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Mail className="h-4 w-4 flex-shrink-0" />
+                <span>info@upliftingroot.org</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-700 mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
+          <p>
+            © {new Date().getFullYear()} Uplifting the Root Artisan Farmers Development Foundation.
+            All rights reserved.
+          </p>
+          <p className="text-gray-500">IT Number: 8552454</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+7.3 src/components/layout/dashboard-sidebar.tsx
+React
+
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import {
+  LayoutDashboard, User, Package, Wrench, Award, DollarSign,
+  Star, Bell, Bookmark, Settings, ShoppingBag, Hammer,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/store/auth-store';
+
+export function DashboardSidebar() {
+  const pathname = usePathname();
+  const { user } = useAuthStore();
+  const isMember = user?.userType === 'MEMBER';
+  const isClient = user?.userType === 'CLIENT';
+
+  const memberLinks = [
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/profile', label: 'My Profile', icon: User },
+    { href: '/my-products', label: 'My Products', icon: Package },
+    { href: '/my-services', label: 'My Services', icon: Wrench },
+    { href: '/my-tools', label: 'My Tools', icon: Hammer },
+    { href: '/my-certificates', label: 'Certificates', icon: Award },
+    { href: '/my-transactions', label: 'Transactions', icon: DollarSign },
+    { href: '/my-ratings', label: 'Ratings', icon: Star },
+    { href: '/notifications', label: 'Notifications', icon: Bell },
+    { href: '/saved', label: 'Saved Items', icon: Bookmark },
+    { href: '/settings', label: 'Settings', icon: Settings },
+  ];
+
+  const clientLinks = [
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/profile', label: 'My Profile', icon: User },
+    { href: '/my-ratings', label: 'My Ratings', icon: Star },
+    { href: '/saved', label: 'Saved Items', icon: Bookmark },
+    { href: '/notifications', label: 'Notifications', icon: Bell },
+    { href: '/settings', label: 'Settings', icon: Settings },
+  ];
+
+  const links = isMember ? memberLinks : clientLinks;
+
+  return (
+    <aside className="w-64 min-h-screen border-r bg-white hidden lg:block">
+      <div className="p-6">
+        <div className="mb-6">
+          <p className="text-sm font-medium text-muted-foreground">
+            {isMember ? 'Member' : 'Client'} Dashboard
+          </p>
+          <p className="text-lg font-semibold truncate">{user?.fullName}</p>
+        </div>
+        <nav className="space-y-1">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                pathname === link.href
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+              )}
+            >
+              <link.icon className="h-4 w-4" />
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
+    </aside>
+  );
+}
+7.4 src/components/layout/admin-sidebar.tsx
+React
+
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import {
+  LayoutDashboard, Users, Shield, CheckCircle, FileText,
+  Calendar, Heart, MessageSquare, Settings, Activity,
+  FolderTree, Bell, KeyRound, BarChart3, Megaphone,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useAdminAuthStore } from '@/store/admin-auth-store';
+
+const adminLinks = [
+  { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, permission: null },
+  { href: '/admin/verifications', label: 'Verifications', icon: CheckCircle, permission: 'canVerifyMembers' },
+  { href: '/admin/users', label: 'Users', icon: Users, permission: null },
+  { href: '/admin/password-resets', label: 'Password Resets', icon: KeyRound, permission: 'canResetPasswords' },
+  { href: '/admin/categories', label: 'Categories', icon: FolderTree, permission: 'canManageContent' },
+  { href: '/admin/content/about', label: 'About Content', icon: FileText, permission: 'canManageContent' },
+  { href: '/admin/content/leadership', label: 'Leadership', icon: Users, permission: 'canManageContent' },
+  { href: '/admin/content/sponsors', label: 'Sponsors', icon: Heart, permission: 'canManageContent' },
+  { href: '/admin/content/testimonials', label: 'Testimonials', icon: MessageSquare, permission: 'canManageContent' },
+  { href: '/admin/events', label: 'Events', icon: Calendar, permission: 'canManageEvents' },
+  { href: '/admin/announcements', label: 'Announcements', icon: Megaphone, permission: 'canManageContent' },
+  { href: '/admin/reports', label: 'Reports', icon: BarChart3, permission: 'canAccessReports' },
+  { href: '/admin/admins', label: 'Admin Users', icon: Shield, permission: 'canManageAdmins' },
+  { href: '/admin/activity-log', label: 'Activity Log', icon: Activity, permission: null },
+  { href: '/admin/settings', label: 'Settings', icon: Settings, permission: null },
+];
+
+export function AdminSidebar() {
+  const pathname = usePathname();
+  const { admin, hasPermission } = useAdminAuthStore();
+
+  const visibleLinks = adminLinks.filter(
+    (link) => !link.permission || hasPermission(link.permission),
+  );
+
+  return (
+    <aside className="w-64 min-h-screen border-r bg-white hidden lg:block overflow-y-auto">
+      <div className="p-6">
+        <div className="mb-6">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            Admin Portal
+          </p>
+          <p className="text-lg font-semibold truncate">{admin?.fullName}</p>
+          <p className="text-xs text-muted-foreground">{admin?.role}</p>
+        </div>
+        <nav className="space-y-1">
+          {visibleLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                pathname.startsWith(link.href)
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+              )}
+            >
+              <link.icon className="h-4 w-4" />
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
+    </aside>
+  );
+}
+PHASE 8: AUTH GUARD COMPONENTS
+8.1 src/components/auth/auth-guard.tsx
+React
+
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/auth-store';
+import { LoadingSpinner } from '@/components/shared/loading-spinner';
+
+interface Props {
+  children: React.ReactNode;
+  requireVerified?: boolean;
+}
+
+export function AuthGuard({ children, requireVerified = false }: Props) {
+  const router = useRouter();
+  const { isAuthenticated, isLoading, user } = useAuthStore();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        router.push('/login');
+        return;
+      }
+      if (requireVerified && user?.verificationStatus !== 'VERIFIED') {
+        router.push('/verification-pending');
+      }
+    }
+  }, [isAuthenticated, isLoading, user, requireVerified, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" text="Loading..." />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) return null;
+  if (requireVerified && user?.verificationStatus !== 'VERIFIED') return null;
+
+  return <>{children}</>;
+}
+8.2 src/components/auth/admin-guard.tsx
+React
+
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAdminAuthStore } from '@/store/admin-auth-store';
+import { LoadingSpinner } from '@/components/shared/loading-spinner';
+
+interface Props {
+  children: React.ReactNode;
+  requiredPermission?: string;
+}
+
+export function AdminGuard({ children, requiredPermission }: Props) {
+  const router = useRouter();
+  const { isAuthenticated, isLoading, admin, hasPermission, checkAuth } = useAdminAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/admin/login');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" text="Loading admin panel..." />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) return null;
+
+  if (requiredPermission && !hasPermission(requiredPermission)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold">Access Denied</h2>
+          <p className="text-muted-foreground mt-2">
+            You don't have permission to access this page.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
+PHASE 9: PAGE LAYOUTS
+9.1 src/app/(public)/layout.tsx
+React
+
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
+
+export default function PublicLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <>
+      <Header />
+      <main className="min-h-screen">{children}</main>
+      <Footer />
+    </>
+  );
+}
+9.2 src/app/(auth)/layout.tsx
+React
+
+import Link from 'next/link';
+
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 py-12">
+      <Link href="/" className="flex items-center gap-2 mb-8">
+        <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+          <span className="text-white font-bold text-lg">U</span>
+        </div>
+        <span className="text-2xl font-bold text-primary">URAFD</span>
+      </Link>
+      <div className="w-full max-w-md">{children}</div>
+    </div>
+  );
+}
+9.3 src/app/(dashboard)/layout.tsx
+React
+
+'use client';
+
+import { Header } from '@/components/layout/header';
+import { DashboardSidebar } from '@/components/layout/dashboard-sidebar';
+import { AuthGuard } from '@/components/auth/auth-guard';
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <AuthGuard>
+      <Header />
+      <div className="flex">
+        <DashboardSidebar />
+        <main className="flex-1 p-6 lg:p-8 bg-gray-50 min-h-screen">
+          {children}
+        </main>
+      </div>
+    </AuthGuard>
+  );
+}
+9.4 src/app/admin/layout.tsx
+React
+
+'use client';
+
+import { usePathname } from 'next/navigation';
+import { AdminSidebar } from '@/components/layout/admin-sidebar';
+import { AdminGuard } from '@/components/auth/admin-guard';
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
+
+  // Don't wrap login page with guard
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
+  return (
+    <AdminGuard>
+      <div className="flex min-h-screen">
+        <AdminSidebar />
+        <main className="flex-1 bg-gray-50">
+          <div className="border-b bg-white px-6 py-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Admin Portal</h2>
+            </div>
+          </div>
+          <div className="p-6 lg:p-8">{children}</div>
+        </main>
+      </div>
+    </AdminGuard>
+  );
+}
+PHASE 10: PAGES
+Due to the massive size of a complete frontend, I'll provide the key pages that demonstrate the full flow. Every other page follows the same patterns.
+
+10.1 src/app/page.tsx — Home Page
+React
+
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
+import { HeroSection } from '@/components/home/hero-section';
+import { StatsSection } from '@/components/home/stats-section';
+import { FeaturedMembers } from '@/components/home/featured-members';
+import { FeaturedProducts } from '@/components/home/featured-products';
+import { CTASection } from '@/components/home/cta-section';
+
+export default function HomePage() {
+  return (
+    <>
+      <Header />
+      <main>
+        <HeroSection />
+        <StatsSection />
+        <FeaturedMembers />
+        <FeaturedProducts />
+        <CTASection />
+      </main>
+      <Footer />
+    </>
+  );
+}
+10.2 src/components/home/hero-section.tsx
+React
+
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ArrowRight, Users, ShoppingBag, Wrench } from 'lucide-react';
+
+export function HeroSection() {
+  return (
+    <section className="relative bg-gradient-to-br from-primary via-primary/80 to-primary text-white overflow-hidden">
+      <div className="absolute inset-0 bg-black/20" />
+      <div className="container-custom relative py-20 md:py-32">
+        <div className="max-w-3xl">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+            Empowering Artisan Farmers Across Nigeria
+          </h1>
+          <p className="text-lg md:text-xl mt-6 text-white/90 max-w-2xl">
+            Connecting skilled farmers and artisans with customers seeking quality
+            products, services, and tools. Join our growing community today.
+          </p>
+          <div className="flex flex-wrap gap-4 mt-8">
+            <Link href="/register/member">
+              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
+                Join as Member
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+            <Link href="/members">
+              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10">
+                Browse Members
+              </Button>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-3 gap-6 mt-12 max-w-lg">
+            {[
+              { icon: Users, label: 'Verified Members', value: '500+' },
+              { icon: ShoppingBag, label: 'Products', value: '1,200+' },
+              { icon: Wrench, label: 'Services', value: '300+' },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <stat.icon className="h-6 w-6 mx-auto mb-2 text-white/80" />
+                <div className="text-2xl font-bold">{stat.value}</div>
+                <div className="text-xs text-white/80">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+10.3 src/components/home/stats-section.tsx
+React
+
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api/client';
+
+export function StatsSection() {
+  return (
+    <section className="py-16 bg-gray-50">
+      <div className="container-custom">
+        <h2 className="text-3xl font-bold text-center mb-12">Our Impact</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {[
+            { label: 'Registered Members', value: '500+' },
+            { label: 'Products Listed', value: '1,200+' },
+            { label: 'Services Available', value: '300+' },
+            { label: 'States Covered', value: '37' },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center">
+              <div className="text-4xl font-bold text-primary">{stat.value}</div>
+              <div className="text-sm text-muted-foreground mt-2">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+10.4 src/components/home/featured-members.tsx
+React
+
+'use client';
+
+import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { membersApi } from '@/lib/api/members.api';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { RatingStars } from '@/components/shared/rating-stars';
+import { PROVIDER_TYPE_MAP } from '@/lib/constants';
+import { MapPin, ArrowRight } from 'lucide-react';
+
+export function FeaturedMembers() {
+  const { data } = useQuery({
+    queryKey: ['featured-members'],
+    queryFn: () => membersApi.getAll({ limit: 4, sortBy: 'rating', sortOrder: 'desc' }),
+  });
+
+  const members = data?.data || [];
+
+  return (
+    <section className="py-16">
+      <div className="container-custom">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold">Featured Members</h2>
+            <p className="text-muted-foreground mt-1">Top-rated farmers and artisans</p>
+          </div>
+          <Link href="/members">
+            <Button variant="outline">
+              View All <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {members.map((member: any) => (
+            <Link key={member.id} href={`/members/${member.id}`}>
+              <Card className="card-hover h-full">
+                <CardContent className="p-6">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                      {member.profilePhotoThumbnail ? (
+                        <img
+                          src={member.profilePhotoThumbnail}
+                          alt={member.user?.fullName}
+                          className="h-20 w-20 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-2xl font-bold text-primary">
+                          {member.user?.fullName?.[0]}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-semibold">{member.user?.fullName}</h3>
+                    <p className="text-xs text-muted-foreground">
+                      {PROVIDER_TYPE_MAP[member.providerType]}
+                    </p>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                      <MapPin className="h-3 w-3" />
+                      {member.localGovernmentArea}, {member.state}
+                    </div>
+                    <div className="mt-3">
+                      <RatingStars
+                        rating={Number(member.averageRating)}
+                        size="sm"
+                        showValue
+                        totalRatings={member.totalRatings}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+10.5 src/components/home/featured-products.tsx
+React
+
+'use client';
+
+import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { productsApi } from '@/lib/api/products.api';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { PriceDisplay } from '@/components/shared/price-display';
+import { ArrowRight, Package } from 'lucide-react';
+
+export function FeaturedProducts() {
+  const { data } = useQuery({
+    queryKey: ['featured-products'],
+    queryFn: () => productsApi.getAll({ limit: 4 }),
+  });
+
+  const products = data?.data || [];
+
+  return (
+    <section className="py-16 bg-gray-50">
+      <div className="container-custom">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold">Latest Products</h2>
+            <p className="text-muted-foreground mt-1">Fresh from our members</p>
+          </div>
+          <Link href="/products">
+            <Button variant="outline">
+              View All <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {products.map((product: any) => (
+            <Link key={product.id} href={`/products/${product.id}`}>
+              <Card className="card-hover h-full overflow-hidden">
+                <div className="aspect-video bg-muted flex items-center justify-center">
+                  {product.images?.[0]?.thumbnailUrl ? (
+                    <img
+                      src={product.images[0].thumbnailUrl}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Package className="h-12 w-12 text-muted-foreground/30" />
+                  )}
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold line-clamp-1">{product.name}</h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {product.member?.user?.fullName}
+                  </p>
+                  <div className="mt-2">
+                    <PriceDisplay
+                      pricingType={product.pricingType}
+                      amount={product.priceAmount ? Number(product.priceAmount) : null}
+                      displayText={product.priceDisplayText}
+                      className="text-sm font-semibold text-primary"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+10.6 src/components/home/cta-section.tsx
+React
+
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+
+export function CTASection() {
+  return (
+    <section className="py-20 bg-primary text-white">
+      <div className="container-custom text-center">
+        <h2 className="text-3xl md:text-4xl font-bold">
+          Ready to Join Our Community?
+        </h2>
+        <p className="text-lg mt-4 text-primary-foreground/80 max-w-2xl mx-auto">
+          Whether you're a farmer, artisan, or looking for quality products and
+          services, we have a place for you.
+        </p>
+        <div className="flex flex-wrap justify-center gap-4 mt-8">
+          <Link href="/register/member">
+            <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
+              Register as Member
+            </Button>
+          </Link>
+          <Link href="/register/client">
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-white border-white hover:bg-white/10"
+            >
+              Register as Client
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+10.7 src/app/(auth)/login/page.tsx
+React
+
+'use client';
+
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
+import { loginSchema, LoginFormData } from '@/lib/validations';
+import { useLogin } from '@/hooks/use-auth';
+
+export default function LoginPage() {
+  const { mutate: login, isPending } = useLogin();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = (data: LoginFormData) => login(data);
+
+  return (
+    <Card>
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl">Welcome Back</CardTitle>
+        <CardDescription>Login with your phone number</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="phoneNumber">Phone Number</Label>
+            <Input
+              id="phoneNumber"
+              placeholder="08012345678"
+              {...register('phoneNumber')}
+            />
+            {errors.phoneNumber && (
+              <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              <Link
+                href="/forgot-password"
+                className="text-sm text-primary hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              {...register('password')}
+            />
+            {errors.password && (
+              <p className="text-sm text-destructive">{errors.password.message}</p>
+            )}
+          </div>
+
+          <Button type="submit" className="w-full" disabled={isPending}>
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Login
+          </Button>
+        </form>
+
+        <div className="mt-6 text-center text-sm">
+          <span className="text-muted-foreground">Don't have an account? </span>
+          <Link href="/register" className="text-primary hover:underline font-medium">
+            Register
+          </Link>
+        </div>
+
+        <div className="mt-4 text-center">
+          <Link
+            href="/admin/login"
+            className="text-xs text-muted-foreground hover:text-primary"
+          >
+            Admin Login →
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+10.8 src/app/(auth)/register/page.tsx
+React
+
+import Link from 'next/link';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Users, ShoppingBag, ArrowRight } from 'lucide-react';
+
+export default function RegisterPage() {
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold">Create Your Account</h1>
+        <p className="text-muted-foreground mt-1">Choose how you want to join</p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+        <Link href="/register/member">
+          <Card className="card-hover cursor-pointer border-2 hover:border-primary">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Users className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold">Join as Member</h3>
+                <p className="text-sm text-muted-foreground">
+                  For farmers and artisans who want to list products, services, and tools
+                </p>
+              </div>
+              <ArrowRight className="h-5 w-5 text-muted-foreground" />
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/register/client">
+          <Card className="card-hover cursor-pointer border-2 hover:border-primary">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <ShoppingBag className="h-6 w-6 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold">Join as Client</h3>
+                <p className="text-sm text-muted-foreground">
+                  For customers looking for products, services, and tools
+                </p>
+              </div>
+              <ArrowRight className="h-5 w-5 text-muted-foreground" />
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
+      <p className="text-center text-sm text-muted-foreground">
+        Already have an account?{' '}
+        <Link href="/login" className="text-primary hover:underline font-medium">
+          Login
+        </Link>
+      </p>
+    </div>
+  );
+}
+10.9 src/app/(auth)/register/member/page.tsx
+React
+
+'use client';
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Loader2 } from 'lucide-react';
+import { memberRegisterSchema, MemberRegisterFormData } from '@/lib/validations';
+import { useRegisterMember } from '@/hooks/use-auth';
+import { StateLgaSelect } from '@/components/shared/state-lga-select';
+
+export default function MemberRegisterPage() {
+  const { mutate: registerMember, isPending } = useRegisterMember();
+  const [state, setState] = useState('');
+  const [lga, setLga] = useState('');
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<MemberRegisterFormData>({
+    resolver: zodResolver(memberRegisterSchema),
+  });
+
+  const onSubmit = (data: MemberRegisterFormData) => {
+    const { confirmPassword, ...submitData } = data;
+    registerMember(submitData);
+  };
+
+  return (
+    <Card>
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl">Register as Member</CardTitle>
+        <CardDescription>
+          Join as a farmer or artisan to list your products, services, and tools
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label>Full Name *</Label>
+            <Input placeholder="John Doe" {...register('fullName')} />
+            {errors.fullName && <p className="text-sm text-destructive">{errors.fullName.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Phone Number *</Label>
+            <Input placeholder="08012345678" {...register('phoneNumber')} />
+            {errors.phoneNumber && <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Email (Optional)</Label>
+            <Input type="email" placeholder="john@example.com" {...register('email')} />
+          </div>
+
+          <div className="space-y-2">
+            <Label>I am a *</Label>
+            <Select onValueChange={(v) => setValue('providerType', v as any)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="FARMER">Farmer</SelectItem>
+                <SelectItem value="ARTISAN">Artisan</SelectItem>
+                <SelectItem value="BOTH">Both Farmer & Artisan</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.providerType && <p className="text-sm text-destructive">{errors.providerType.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Address *</Label>
+            <Textarea placeholder="Your full address" {...register('address')} />
+            {errors.address && <p className="text-sm text-destructive">{errors.address.message}</p>}
+          </div>
+
+          <StateLgaSelect
+            state={state}
+            lga={lga}
+            onStateChange={(v) => { setState(v); setValue('state', v); }}
+            onLgaChange={(v) => { setLga(v); setValue('localGovernmentArea', v); }}
+          />
+          {errors.state && <p className="text-sm text-destructive">{errors.state.message}</p>}
+
+          <div className="space-y-2">
+            <Label>Password *</Label>
+            <Input type="password" placeholder="Min 8 characters" {...register('password')} />
+            {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Confirm Password *</Label>
+            <Input type="password" placeholder="Repeat password" {...register('confirmPassword')} />
+            {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
+          </div>
+
+          <Button type="submit" className="w-full" disabled={isPending}>
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Register
+          </Button>
+        </form>
+
+        <p className="mt-4 text-center text-sm text-muted-foreground">
+          Already have an account?{' '}
+          <Link href="/login" className="text-primary hover:underline">Login</Link>
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+10.10 src/app/(auth)/register/client/page.tsx
+React
+
+'use client';
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
+import { clientRegisterSchema, ClientRegisterFormData } from '@/lib/validations';
+import { useRegisterClient } from '@/hooks/use-auth';
+import { StateLgaSelect } from '@/components/shared/state-lga-select';
+
+export default function ClientRegisterPage() {
+  const { mutate: registerClient, isPending } = useRegisterClient();
+  const [state, setState] = useState('');
+  const [lga, setLga] = useState('');
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<ClientRegisterFormData>({
+    resolver: zodResolver(clientRegisterSchema),
+  });
+
+  const onSubmit = (data: ClientRegisterFormData) => {
+    const { confirmPassword, ...submitData } = data;
+    registerClient(submitData);
+  };
+
+  return (
+    <Card>
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl">Register as Client</CardTitle>
+        <CardDescription>Join to browse and rate products, services, and tools</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label>Full Name *</Label>
+            <Input placeholder="Jane Doe" {...register('fullName')} />
+            {errors.fullName && <p className="text-sm text-destructive">{errors.fullName.message}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label>Phone Number *</Label>
+            <Input placeholder="08012345678" {...register('phoneNumber')} />
+            {errors.phoneNumber && <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label>Email (Optional)</Label>
+            <Input type="email" {...register('email')} />
+          </div>
+          <StateLgaSelect
+            state={state} lga={lga}
+            onStateChange={(v) => { setState(v); setValue('state', v); }}
+            onLgaChange={(v) => { setLga(v); setValue('localGovernmentArea', v); }}
+          />
+          <div className="space-y-2">
+            <Label>Password *</Label>
+            <Input type="password" {...register('password')} />
+            {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label>Confirm Password *</Label>
+            <Input type="password" {...register('confirmPassword')} />
+            {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
+          </div>
+          <Button type="submit" className="w-full" disabled={isPending}>
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Register
+          </Button>
+        </form>
+        <p className="mt-4 text-center text-sm text-muted-foreground">
+          Already have an account? <Link href="/login" className="text-primary hover:underline">Login</Link>
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+10.11 src/app/(auth)/verification-pending/page.tsx
+React
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Clock, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
+
+export default function VerificationPendingPage() {
+  return (
+    <Card className="text-center">
+      <CardHeader>
+        <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-yellow-100 flex items-center justify-center">
+          <Clock className="h-8 w-8 text-yellow-600" />
+        </div>
+        <CardTitle className="text-2xl">Verification Pending</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-muted-foreground">
+          Your registration has been submitted successfully. An administrator will
+          review your account and verify it shortly.
+        </p>
+        <div className="bg-muted rounded-lg p-4 text-sm text-left space-y-2">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <span>Registration submitted</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-yellow-600" />
+            <span>Awaiting admin verification</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <CheckCircle className="h-4 w-4" />
+            <span>Full access granted after verification</span>
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          You will be able to login once your account is verified. This usually
+          takes 1-2 business days.
+        </p>
+        <Link href="/login">
+          <Button variant="outline" className="w-full">
+            Back to Login
+          </Button>
+        </Link>
+      </CardContent>
+    </Card>
+  );
+}
+10.12 src/app/(public)/members/page.tsx
+React
+
+'use client';
+
+import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useMembers } from '@/hooks/use-members';
+import { usePagination } from '@/hooks/use-pagination';
+import { useDebounce } from '@/hooks/use-debounce';
+import { PageHeader } from '@/components/shared/page-header';
+import { LoadingSpinner } from '@/components/shared/loading-spinner';
+import { EmptyState } from '@/components/shared/empty-state';
+import { PaginationControls } from '@/components/shared/pagination-controls';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
+import { RatingStars } from '@/components/shared/rating-stars';
+import { PROVIDER_TYPE_MAP, NIGERIAN_STATES } from '@/lib/constants';
+import { Search, Users, MapPin } from 'lucide-react';
+import Link from 'next/link';
+
+export default function MembersPage() {
+  const { page, setPage } = usePagination();
+  const [search, setSearch] = useState('');
+  const [providerType, setProviderType] = useState('');
+  const [state, setState] = useState('');
+  const debouncedSearch = useDebounce(search, 500);
+
+  const { data, isLoading } = useMembers({
+    page,
+    limit: 12,
+    search: debouncedSearch || undefined,
+    providerType: providerType || undefined,
+    state: state || undefined,
+  });
+
+  return (
+    <div className="container-custom py-8">
+      <PageHeader
+        title="Our Members"
+        description="Browse verified farmers and artisans across Nigeria"
+      />
+
+      {/* Filters */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search members..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Select value={providerType} onValueChange={setProviderType}>
+          <SelectTrigger>
+            <SelectValue placeholder="All Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All Types</SelectItem>
+            <SelectItem value="FARMER">Farmers</SelectItem>
+            <SelectItem value="ARTISAN">Artisans</SelectItem>
+            <SelectItem value="BOTH">Both</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={state} onValueChange={setState}>
+          <SelectTrigger>
+            <SelectValue placeholder="All States" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All States</SelectItem>
+            {NIGERIAN_STATES.map((s) => (
+              <SelectItem key={s} value={s}>{s}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {isLoading ? (
+        <LoadingSpinner size="lg" text="Loading members..." className="py-20" />
+      ) : data?.data?.length === 0 ? (
+        <EmptyState icon={Users} title="No members found" description="Try adjusting your filters" />
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {data?.data?.map((member: any) => (
+              <Link key={member.id} href={`/members/${member.id}`}>
+                <Card className="card-hover h-full">
+                  <CardContent className="p-6 text-center">
+                    <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                      {member.profilePhotoThumbnail ? (
+                        <img src={member.profilePhotoThumbnail} alt="" className="h-20 w-20 rounded-full object-cover" />
+                      ) : (
+                        <span className="text-2xl font-bold text-primary">
+                          {member.user?.fullName?.[0]}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-semibold">{member.user?.fullName}</h3>
+                    <p className="text-xs text-primary font-medium mt-1">
+                      {PROVIDER_TYPE_MAP[member.providerType]}
+                    </p>
+                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mt-2">
+                      <MapPin className="h-3 w-3" />
+                      {member.state}
+                    </div>
+                    {member.tagline && (
+                      <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{member.tagline}</p>
+                    )}
+                    <div className="mt-3 flex justify-center">
+                      <RatingStars rating={Number(member.averageRating)} size="sm" showValue totalRatings={member.totalRatings} />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+
+          {data?.meta && (
+            <PaginationControls meta={data.meta} onPageChange={setPage} />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+10.13 src/app/(dashboard)/dashboard/page.tsx
+React
+
+'use client';
+
+import { useAuthStore } from '@/store/auth-store';
+import { useProfile } from '@/hooks/use-auth';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatusBadge } from '@/components/shared/status-badge';
+import { Package, Wrench, Hammer, Star, Eye, DollarSign } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+
+export default function DashboardPage() {
+  const { user } = useAuthStore();
+  const { data: profileData } = useProfile();
+  const profile = profileData?.data;
+  const memberProfile = profile?.memberProfile;
+
+  return (
+    <div className="space-y-8">
+      {/* Welcome */}
+      <div>
+        <h1 className="text-3xl font-bold">Welcome, {user?.fullName?.split(' ')[0]}!</h1>
+        <div className="flex items-center gap-2 mt-2">
+          <span className="text-muted-foreground">Account Status:</span>
+          <StatusBadge status={user?.verificationStatus || 'PENDING'} />
+        </div>
+      </div>
+
+      {/* Quick Stats (Members only) */}
+      {user?.userType === 'MEMBER' && memberProfile && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[
+            { label: 'Products', value: memberProfile.totalProducts, icon: Package, href: '/my-products' },
+            { label: 'Services', value: memberProfile.totalServices, icon: Wrench, href: '/my-services' },
+            { label: 'Tools', value: memberProfile.totalTools, icon: Hammer, href: '/my-tools' },
+            { label: 'Rating', value: Number(memberProfile.averageRating).toFixed(1), icon: Star, href: '/my-ratings' },
+            { label: 'Profile Views', value: memberProfile.profileViewCount, icon: Eye, href: '#' },
+            { label: 'Transactions', value: memberProfile.totalTransactions, icon: DollarSign, href: '/my-transactions' },
+          ].map((stat) => (
+            <Link key={stat.label} href={stat.href}>
+              <Card className="card-hover">
+                <CardContent className="p-4 text-center">
+                  <stat.icon className="h-6 w-6 mx-auto mb-2 text-primary" />
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <div className="text-xs text-muted-foreground">{stat.label}</div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-3">
+          {user?.userType === 'MEMBER' && (
+            <>
+              <Link href="/my-products/new"><Button>Add Product</Button></Link>
+              <Link href="/my-services/new"><Button variant="outline">Add Service</Button></Link>
+              <Link href="/my-tools/new"><Button variant="outline">List Tool</Button></Link>
+              <Link href="/my-certificates/new"><Button variant="outline">Upload Certificate</Button></Link>
+              <Link href="/my-transactions/new"><Button variant="outline">Record Transaction</Button></Link>
+            </>
+          )}
+          <Link href="/profile/edit"><Button variant="outline">Edit Profile</Button></Link>
+          <Link href="/settings"><Button variant="outline">Settings</Button></Link>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+10.14 src/app/admin/login/page.tsx
+React
+
+'use client';
+
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Shield, Loader2 } from 'lucide-react';
+import { adminLoginSchema, AdminLoginFormData } from '@/lib/validations';
+import { adminApi } from '@/lib/api/admin.api';
+import { useAdminAuthStore } from '@/store/admin-auth-store';
+
+export default function AdminLoginPage() {
+  const router = useRouter();
+  const { setAuth } = useAdminAuthStore();
+  const { register, handleSubmit, formState: { errors } } = useForm<AdminLoginFormData>({
+    resolver: zodResolver(adminLoginSchema),
+  });
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: adminApi.login,
+    onSuccess: (response) => {
+      const { accessToken, admin } = response.data;
+      setAuth(admin, accessToken);
+      toast.success('Admin login successful');
+      if (admin.mustChangePassword) {
+        toast.info('Please change your password');
+      }
+      router.push('/admin/dashboard');
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Login failed'),
+  });
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <Shield className="h-6 w-6 text-primary" />
+          </div>
+          <CardTitle className="text-2xl">Admin Portal</CardTitle>
+          <CardDescription>Login to manage the platform</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit((data) => mutate(data))} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Username</Label>
+              <Input placeholder="admin" {...register('username')} />
+              {errors.username && <p className="text-sm text-destructive">{errors.username.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label>Password</Label>
+              <Input type="password" {...register('password')} />
+              {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+            </div>
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Login
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+10.15 src/app/admin/dashboard/page.tsx
+React
+
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { adminApi } from '@/lib/api/admin.api';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LoadingSpinner } from '@/components/shared/loading-spinner';
+import { StatusBadge } from '@/components/shared/status-badge';
+import { formatRelativeTime } from '@/lib/format';
+import {
+  Users, UserCheck, Clock, Package, Wrench, Hammer,
+  Star, DollarSign, Calendar, Heart, AlertTriangle, KeyRound,
+} from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+
+export default function AdminDashboardPage() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-dashboard'],
+    queryFn: adminApi.getDashboard,
+    refetchInterval: 60000,
+  });
+
+  if (isLoading) return <LoadingSpinner size="lg" text="Loading dashboard..." className="py-20" />;
+
+  const counts = data?.data?.counts || {};
+  const recentUsers = data?.data?.recentUsers || [];
+  const recentActivity = data?.data?.recentActivity || [];
+
+  const statCards = [
+    { label: 'Total Users', value: counts.totalUsers, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Members', value: counts.totalMembers, icon: Users, color: 'text-green-600', bg: 'bg-green-50' },
+    { label: 'Clients', value: counts.totalClients, icon: Users, color: 'text-purple-600', bg: 'bg-purple-50' },
+    { label: 'Pending Verifications', value: counts.pendingVerifications, icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50', href: '/admin/verifications' },
+    { label: 'Password Resets', value: counts.pendingPasswordResets, icon: KeyRound, color: 'text-orange-600', bg: 'bg-orange-50', href: '/admin/password-resets' },
+    { label: 'Products', value: counts.totalProducts, icon: Package, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+    { label: 'Services', value: counts.totalServices, icon: Wrench, color: 'text-teal-600', bg: 'bg-teal-50' },
+    { label: 'Tools', value: counts.totalTools, icon: Hammer, color: 'text-cyan-600', bg: 'bg-cyan-50' },
+    { label: 'Ratings', value: counts.totalRatings, icon: Star, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+    { label: 'Events', value: counts.totalEvents, icon: Calendar, color: 'text-pink-600', bg: 'bg-pink-50' },
+    { label: 'Sponsors', value: counts.totalSponsors, icon: Heart, color: 'text-red-600', bg: 'bg-red-50' },
+    { label: 'Suspended', value: counts.suspendedUsers, icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50' },
+  ];
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        {counts.pendingVerifications > 0 && (
+          <Link href="/admin/verifications">
+            <Button>
+              <Clock className="mr-2 h-4 w-4" />
+              {counts.pendingVerifications} Pending
+            </Button>
+          </Link>
+        )}
+      </div>
+
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+        {statCards.map((stat) => {
+          const Wrapper = stat.href ? Link : 'div';
+          const wrapperProps = stat.href ? { href: stat.href } : {};
+
+          return (
+            <Wrapper key={stat.label} {...(wrapperProps as any)}>
+              <Card className={stat.href ? 'card-hover cursor-pointer' : ''}>
+                <CardContent className="p-4">
+                  <div className={`h-8 w-8 rounded-lg ${stat.bg} flex items-center justify-center mb-2`}>
+                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                  </div>
+                  <div className="text-2xl font-bold">{stat.value || 0}</div>
+                  <div className="text-xs text-muted-foreground">{stat.label}</div>
+                </CardContent>
+              </Card>
+            </Wrapper>
+          );
+        })}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Users */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg">Recent Registrations</CardTitle>
+            <Link href="/admin/users">
+              <Button variant="ghost" size="sm">View All</Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recentUsers.map((user: any) => (
+                <div key={user.id} className="flex items-center justify-between text-sm">
+                  <div>
+                    <p className="font-medium">{user.fullName}</p>
+                    <p className="text-xs text-muted-foreground">{user.userType}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <StatusBadge status={user.verificationStatus} />
+                    <span className="text-xs text-muted-foreground">
+                      {formatRelativeTime(user.createdAt)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg">Recent Activity</CardTitle>
+            <Link href="/admin/activity-log">
+              <Button variant="ghost" size="sm">View All</Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recentActivity.map((log: any) => (
+                <div key={log.id} className="text-sm">
+                  <p className="font-medium">{log.actionDescription}</p>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>by {log.admin?.fullName}</span>
+                    <span>•</span>
+                    <span>{formatRelativeTime(log.createdAt)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+10.16 src/app/admin/verifications/page.tsx
+React
+
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { adminApi } from '@/lib/api/admin.api';
+import { usePagination } from '@/hooks/use-pagination';
+import { PageHeader } from '@/components/shared/page-header';
+import { LoadingSpinner } from '@/components/shared/loading-spinner';
+import { PaginationControls } from '@/components/shared/pagination-controls';
+import { StatusBadge } from '@/components/shared/status-badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { formatDate } from '@/lib/format';
+import { PROVIDER_TYPE_MAP } from '@/lib/constants';
+import { Eye, Clock } from 'lucide-react';
+import Link from 'next/link';
+
+export default function VerificationsPage() {
+  const { page, setPage } = usePagination();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-verifications', page],
+    queryFn: () => adminApi.getPendingVerifications({ page, limit: 12 }),
+  });
+
+  return (
+    <div>
+      <PageHeader
+        title="Pending Verifications"
+        description="Review and verify user registrations"
+      />
+
+      {isLoading ? (
+        <LoadingSpinner size="lg" className="py-20" />
+      ) : data?.data?.length === 0 ? (
+        <Card>
+          <CardContent className="py-16 text-center">
+            <Clock className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+            <h3 className="text-lg font-semibold">No pending verifications</h3>
+            <p className="text-muted-foreground">All users have been reviewed</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          <div className="space-y-4">
+            {data?.data?.map((user: any) => (
+              <Card key={user.id}>
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-lg font-bold text-primary">
+                        {user.fullName?.[0]}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-semibold">{user.fullName}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>{user.phoneNumber}</span>
+                        <span>•</span>
+                        <span>{user.userType}</span>
+                        {user.memberProfile && (
+                          <>
+                            <span>•</span>
+                            <span>{PROVIDER_TYPE_MAP[user.memberProfile.providerType]}</span>
+                          </>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                        <span>Submitted: {formatDate(user.verificationSubmittedAt)}</span>
+                        {user.resubmissionCount > 0 && (
+                          <span className="text-orange-600">
+                            (Resubmitted {user.resubmissionCount}x)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <StatusBadge status={user.verificationStatus} />
+                    <span className="text-xs text-muted-foreground">
+                      {user.verificationDocuments?.length || 0} docs
+                    </span>
+                    <Link href={`/admin/verifications/${user.id}`}>
+                      <Button size="sm">
+                        <Eye className="mr-2 h-4 w-4" />
+                        Review
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {data?.meta && (
+            <PaginationControls meta={data.meta} onPageChange={setPage} />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+10.17 src/app/admin/verifications/[id]/page.tsx
+React
+
+'use client';
+
+import { useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { adminApi } from '@/lib/api/admin.api';
+import { PageHeader } from '@/components/shared/page-header';
+import { LoadingSpinner } from '@/components/shared/loading-spinner';
+import { StatusBadge } from '@/components/shared/status-badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { formatDate, formatPhoneNumber } from '@/lib/format';
+import { PROVIDER_TYPE_MAP } from '@/lib/constants';
+import { CheckCircle, XCircle, RotateCcw, Loader2 } from 'lucide-react';
+
+export default function VerificationDetailPage() {
+  const { id } = useParams();
+  const router = useRouter();
+  const qc = useQueryClient();
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectDetails, setRejectDetails] = useState('');
+  const [resubReason, setResubReason] = useState('');
+  const [showRejectForm, setShowRejectForm] = useState(false);
+  const [showResubForm, setShowResubForm] = useState(false);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['verification-detail', id],
+    queryFn: () => adminApi.getVerificationDetail(id as string),
+    enabled: !!id,
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: () => adminApi.approveUser(id as string),
+    onSuccess: () => {
+      toast.success('User approved!');
+      qc.invalidateQueries({ queryKey: ['admin-verifications'] });
+      router.push('/admin/verifications');
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: () => adminApi.rejectUser(id as string, { reason: rejectReason, details: rejectDetails }),
+    onSuccess: () => {
+      toast.success('User rejected');
+      qc.invalidateQueries({ queryKey: ['admin-verifications'] });
+      router.push('/admin/verifications');
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+
+  const resubMutation = useMutation({
+    mutationFn: () => adminApi.requestResubmission(id as string, { reason: resubReason }),
+    onSuccess: () => {
+      toast.success('Resubmission requested');
+      qc.invalidateQueries({ queryKey: ['admin-verifications'] });
+      router.push('/admin/verifications');
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+
+  if (isLoading) return <LoadingSpinner size="lg" className="py-20" />;
+
+  const user = data?.data;
+  if (!user) return <div>User not found</div>;
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title={`Verify: ${user.fullName}`} />
+
+      {/* User Info */}
+      <Card>
+        <CardHeader><CardTitle>User Information</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div><span className="text-muted-foreground">Name:</span> <strong>{user.fullName}</strong></div>
+          <div><span className="text-muted-foreground">Phone:</span> <strong>{formatPhoneNumber(user.phoneNumber)}</strong></div>
+          <div><span className="text-muted-foreground">Email:</span> <strong>{user.email || 'N/A'}</strong></div>
+          <div><span className="text-muted-foreground">Type:</span> <strong>{user.userType}</strong></div>
+          <div><span className="text-muted-foreground">Status:</span> <StatusBadge status={user.verificationStatus} /></div>
+          <div><span className="text-muted-foreground">Submitted:</span> <strong>{formatDate(user.verificationSubmittedAt)}</strong></div>
+          {user.memberProfile && (
+            <>
+              <div><span className="text-muted-foreground">Provider Type:</span> <strong>{PROVIDER_TYPE_MAP[user.memberProfile.providerType]}</strong></div>
+              <div><span className="text-muted-foreground">Address:</span> <strong>{user.memberProfile.address}</strong></div>
+              <div><span className="text-muted-foreground">State:</span> <strong>{user.memberProfile.state}</strong></div>
+              <div><span className="text-muted-foreground">LGA:</span> <strong>{user.memberProfile.localGovernmentArea}</strong></div>
+            </>
+          )}
+          {user.clientProfile && (
+            <>
+              <div><span className="text-muted-foreground">State:</span> <strong>{user.clientProfile.state || 'N/A'}</strong></div>
+              <div>
+                <span className="text-muted-foreground">NIN Photo:</span>{' '}
+                {user.clientProfile.ninPhotoUrl ? (
+                  <a href={user.clientProfile.ninPhotoUrl} target="_blank" className="text-primary underline">View NIN</a>
+                ) : (
+                  <strong>Not uploaded</strong>
+                )}
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Documents */}
+      {user.verificationDocuments?.length > 0 && (
+        <Card>
+          <CardHeader><CardTitle>Verification Documents</CardTitle></CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {user.verificationDocuments.map((doc: any) => (
+                <div key={doc.id} className="border rounded-lg p-3">
+                  <p className="text-sm font-medium">{doc.documentType.replace(/_/g, ' ')}</p>
+                  <a href={doc.fileUrl} target="_blank" className="text-primary text-sm underline">
+                    View Document
+                  </a>
+                  <div className="mt-1">
+                    <StatusBadge status={doc.verificationStatus} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Action Buttons */}
+      <Card>
+        <CardHeader><CardTitle>Actions</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap gap-3">
+            <Button
+              onClick={() => approveMutation.mutate()}
+              disabled={approveMutation.isPending}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {approveMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
+              Approve
+            </Button>
+            <Button variant="destructive" onClick={() => setShowRejectForm(!showRejectForm)}>
+              <XCircle className="mr-2 h-4 w-4" />
+              Reject
+            </Button>
+            <Button variant="outline" onClick={() => setShowResubForm(!showResubForm)}>
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Request Resubmission
+            </Button>
+          </div>
+
+          {showRejectForm && (
+            <div className="border rounded-lg p-4 space-y-3">
+              <Label>Rejection Reason *</Label>
+              <Textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="Reason for rejection" />
+              <Label>Details *</Label>
+              <Textarea value={rejectDetails} onChange={(e) => setRejectDetails(e.target.value)} placeholder="Detailed explanation" />
+              <Button variant="destructive" onClick={() => rejectMutation.mutate()} disabled={!rejectReason || !rejectDetails || rejectMutation.isPending}>
+                {rejectMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Confirm Rejection
+              </Button>
+            </div>
+          )}
+
+          {showResubForm && (
+            <div className="border rounded-lg p-4 space-y-3">
+              <Label>Resubmission Reason *</Label>
+              <Textarea value={resubReason} onChange={(e) => setResubReason(e.target.value)} placeholder="What needs to be resubmitted and why" />
+              <Button onClick={() => resubMutation.mutate()} disabled={!resubReason || resubMutation.isPending}>
+                {resubMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Send Resubmission Request
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+10.18 src/app/not-found.tsx
+React
+
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Home } from 'lucide-react';
+
+export default function NotFound() {
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="text-center">
+        <h1 className="text-6xl font-bold text-primary">404</h1>
+        <h2 className="text-2xl font-semibold mt-4">Page Not Found</h2>
+        <p className="text-muted-foreground mt-2">
+          The page you're looking for doesn't exist or has been moved.
+        </p>
+        <Link href="/">
+          <Button className="mt-6">
+            <Home className="mr-2 h-4 w-4" />
+            Go Home
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
+10.19 src/app/loading.tsx
+React
+
+import { LoadingSpinner } from '@/components/shared/loading-spinner';
+
+export default function Loading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <LoadingSpinner size="lg" text="Loading..." />
+    </div>
+  );
+}
+10.20 src/app/error.tsx
+React
+
+'use client';
+
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="text-center">
+        <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+        <h2 className="text-2xl font-semibold">Something went wrong!</h2>
+        <p className="text-muted-foreground mt-2 max-w-md">
+          An unexpected error occurred. Please try again.
+        </p>
+        <Button onClick={reset} className="mt-6">
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Try Again
+        </Button>
+      </div>
+    </div>
+  );
+}
+PHASE 11: TYPES
+11.1 src/types/index.ts
+TypeScript
+
+// API Response Types
+export interface ApiResponse<T> {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: T;
+  timestamp: string;
+}
+
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: PaginationMeta;
+}
+
+// Enums
+export type UserType = 'MEMBER' | 'CLIENT' | 'ADMIN';
+export type VerificationStatus = 'PENDING' | 'UNDER_REVIEW' | 'VERIFIED' | 'REJECTED' | 'SUSPENDED' | 'RESUBMITTED';
+export type ProviderType = 'FARMER' | 'ARTISAN' | 'BOTH';
+export type PricingType = 'FIXED' | 'NEGOTIABLE' | 'BOTH';
+export type ProductAvailability = 'AVAILABLE' | 'OUT_OF_STOCK' | 'SEASONAL' | 'LIMITED_STOCK' | 'DISCONTINUED';
+export type ToolCondition = 'NEW' | 'LIKE_NEW' | 'GOOD' | 'FAIR' | 'FOR_PARTS';
+export type ToolListingPurpose = 'FOR_SALE' | 'FOR_LEASE' | 'BOTH';
+export type RatingCategory = 'PRODUCT_RATING' | 'SERVICE_RATING' | 'TOOL_LEASE_RATING' | 'OVERALL_MEMBER';
+
+// Core Types
+export interface User {
+  id: string;
+  phoneNumber: string;
+  fullName: string;
+  email?: string;
+  userType: UserType;
+  verificationStatus: VerificationStatus;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface MemberProfile {
+  id: string;
+  userId: string;
+  providerType: ProviderType;
+  profilePhotoUrl?: string;
+  profilePhotoThumbnail?: string;
+  bio?: string;
+  tagline?: string;
+  address: string;
+  localGovernmentArea: string;
+  state: string;
+  yearsOfExperience?: number;
+  averageRating: number;
+  totalRatings: number;
+  totalProducts: number;
+  totalServices: number;
+  totalTools: number;
+  totalCertificates: number;
+  profileViewCount: number;
+  user: User;
+}
+
+export interface Product {
+  id: string;
+  memberId: string;
+  name: string;
+  description: string;
+  pricingType: PricingType;
+  priceAmount?: number;
+  priceDisplayText?: string;
+  availability: ProductAvailability;
+  averageRating: number;
+  viewCount: number;
+  images: { id: string; imageUrl: string; thumbnailUrl?: string; isPrimary: boolean }[];
+  category: { id: string; name: string };
+  member: { id: string; user: { fullName: string } };
+}
+
+export interface Service {
+  id: string;
+  memberId: string;
+  name: string;
+  description: string;
+  pricingType: PricingType;
+  startingPrice?: number;
+  priceDisplayText?: string;
+  availability: string;
+  averageRating: number;
+  images: any[];
+  category: { id: string; name: string };
+  member: { id: string; user: { fullName: string } };
+}
+
+export interface Tool {
+  id: string;
+  memberId: string;
+  name: string;
+  description: string;
+  condition: ToolCondition;
+  listingPurpose: ToolListingPurpose;
+  salePrice?: number;
+  leaseRate?: number;
+  images: any[];
+  category: { id: string; name: string };
+  member: { id: string; user: { fullName: string } };
+}
+
+export interface Rating {
+  id: string;
+  overallRating: number;
+  reviewTitle?: string;
+  reviewText?: string;
+  ratingCategory: RatingCategory;
+  client: { user: { fullName: string } };
+  createdAt: string;
+}
+
+export interface Category {
+  id: string;
+  categoryCode: string;
+  categoryType: string;
+  name: string;
+  description?: string;
+  children?: Category[];
+}
+
+export interface UploadResult {
+  imageUrl: string;
+  thumbnailUrl: string;
+  mediumUrl: string;
+  publicId: string;
+  width: number;
+  height: number;
+  fileSize: number;
+}
+
+frontend/
+├── public/
+│   ├── images/
+│   │   ├── logo.png                           # Foundation logo
+│   │   ├── logo-dark.png                      # Dark version
+│   │   ├── favicon.ico                        # Browser favicon
+│   │   ├── hero-banner.jpg                    # Home page hero image
+│   │   ├── about-hero.jpg                     # About page hero
+│   │   ├── placeholder-profile.png            # Default profile picture
+│   │   ├── placeholder-product.png            # Default product image
+│   │   └── og-image.jpg                       # Social media preview image
+│   │
+│   ├── icons/
+│   │   ├── apple-touch-icon.png
+│   │   ├── icon-192x192.png
+│   │   └── icon-512x512.png
+│   │
+│   └── manifest.json                          # PWA manifest
+│
+├── src/
+│   ├── app/                                   # Next.js App Router pages
+│   │   ├── layout.tsx                         # Root layout
+│   │   ├── page.tsx                           # Home page
+│   │   ├── loading.tsx                        # Root loading state
+│   │   ├── error.tsx                          # Root error boundary
+│   │   ├── not-found.tsx                      # 404 page
+│   │   ├── globals.css                        # Global styles
+│   │   │
+│   │   ├── (public)/                          # Public pages (no auth needed)
+│   │   │   ├── layout.tsx                     # Public layout with navbar/footer
+│   │   │   │
+│   │   │   ├── about/
+│   │   │   │   ├── page.tsx                   # About page
+│   │   │   │   └── loading.tsx
+│   │   │   │
+│   │   │   ├── members/
+│   │   │   │   ├── page.tsx                   # Members directory/listing
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── [id]/
+│   │   │   │       ├── page.tsx               # Individual member profile
+│   │   │   │       └── loading.tsx
+│   │   │   │
+│   │   │   ├── products/
+│   │   │   │   ├── page.tsx                   # Products listing
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── [id]/
+│   │   │   │       ├── page.tsx               # Product detail
+│   │   │   │       └── loading.tsx
+│   │   │   │
+│   │   │   ├── services/
+│   │   │   │   ├── page.tsx                   # Services listing
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── [id]/
+│   │   │   │       ├── page.tsx               # Service detail
+│   │   │   │       └── loading.tsx
+│   │   │   │
+│   │   │   ├── tools/
+│   │   │   │   ├── page.tsx                   # Tools marketplace
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── [id]/
+│   │   │   │       ├── page.tsx               # Tool detail
+│   │   │   │       └── loading.tsx
+│   │   │   │
+│   │   │   ├── events/
+│   │   │   │   ├── page.tsx                   # Events listing
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── [id]/
+│   │   │   │       ├── page.tsx               # Event detail
+│   │   │   │       └── loading.tsx
+│   │   │   │
+│   │   │   ├── search/
+│   │   │   │   └── page.tsx                   # Search results
+│   │   │   │
+│   │   │   ├── contact/
+│   │   │   │   └── page.tsx                   # Contact page
+│   │   │   │
+│   │   │   └── faq/
+│   │   │       └── page.tsx                   # FAQ page
+│   │   │
+│   │   ├── (auth)/                            # Authentication pages
+│   │   │   ├── layout.tsx                     # Auth layout (centered forms)
+│   │   │   │
+│   │   │   ├── login/
+│   │   │   │   └── page.tsx                   # Login page
+│   │   │   │
+│   │   │   ├── register/
+│   │   │   │   ├── page.tsx                   # Registration type selection
+│   │   │   │   ├── member/
+│   │   │   │   │   └── page.tsx               # Member registration form
+│   │   │   │   └── client/
+│   │   │   │       └── page.tsx               # Client registration form
+│   │   │   │
+│   │   │   ├── forgot-password/
+│   │   │   │   └── page.tsx                   # Password reset request
+│   │   │   │
+│   │   │   └── verification-pending/
+│   │   │       └── page.tsx                   # Waiting for admin verification
+│   │   │
+│   │   ├── (dashboard)/                       # Authenticated user pages
+│   │   │   ├── layout.tsx                     # Dashboard layout with sidebar
+│   │   │   │
+│   │   │   ├── dashboard/
+│   │   │   │   └── page.tsx                   # User dashboard home
+│   │   │   │
+│   │   │   ├── profile/
+│   │   │   │   ├── page.tsx                   # View/Edit profile
+│   │   │   │   └── edit/
+│   │   │   │       └── page.tsx               # Edit profile form
+│   │   │   │
+│   │   │   ├── my-products/
+│   │   │   │   ├── page.tsx                   # List my products
+│   │   │   │   ├── new/
+│   │   │   │   │   └── page.tsx               # Create new product
+│   │   │   │   └── [id]/
+│   │   │   │       └── edit/
+│   │   │   │           └── page.tsx           # Edit product
+│   │   │   │
+│   │   │   ├── my-services/
+│   │   │   │   ├── page.tsx                   # List my services
+│   │   │   │   ├── new/
+│   │   │   │   │   └── page.tsx               # Create new service
+│   │   │   │   └── [id]/
+│   │   │   │       └── edit/
+│   │   │   │           └── page.tsx           # Edit service
+│   │   │   │
+│   │   │   ├── my-tools/
+│   │   │   │   ├── page.tsx                   # List my tools
+│   │   │   │   ├── new/
+│   │   │   │   │   └── page.tsx               # Create new tool listing
+│   │   │   │   └── [id]/
+│   │   │   │       └── edit/
+│   │   │   │           └── page.tsx           # Edit tool listing
+│   │   │   │
+│   │   │   ├── my-certificates/
+│   │   │   │   ├── page.tsx                   # List my certificates
+│   │   │   │   └── new/
+│   │   │   │       └── page.tsx               # Upload new certificate
+│   │   │   │
+│   │   │   ├── my-transactions/
+│   │   │   │   ├── page.tsx                   # Transaction history
+│   │   │   │   └── new/
+│   │   │   │       └── page.tsx               # Record new transaction
+│   │   │   │
+│   │   │   ├── my-ratings/
+│   │   │   │   └── page.tsx                   # View ratings received/given
+│   │   │   │
+│   │   │   ├── notifications/
+│   │   │   │   └── page.tsx                   # Notifications list
+│   │   │   │
+│   │   │   ├── saved/
+│   │   │   │   └── page.tsx                   # Saved/bookmarked items
+│   │   │   │
+│   │   │   └── settings/
+│   │   │       └── page.tsx                   # Account settings
+│   │   │
+│   │   └── admin/                             # Admin portal
+│   │       ├── layout.tsx                     # Admin layout
+│   │       │
+│   │       ├── login/
+│   │       │   └── page.tsx                   # Admin login
+│   │       │
+│   │       ├── dashboard/
+│   │       │   └── page.tsx                   # Admin dashboard
+│   │       │
+│   │       ├── verifications/
+│   │       │   ├── page.tsx                   # Pending verifications list
+│   │       │   └── [id]/
+│   │       │       └── page.tsx               # Review specific verification
+│   │       │
+│   │       ├── users/
+│   │       │   ├── page.tsx                   # All users list
+│   │       │   ├── members/
+│   │       │   │   └── page.tsx               # Members list
+│   │       │   ├── clients/
+│   │       │   │   └── page.tsx               # Clients list
+│   │       │   └── [id]/
+│   │       │       └── page.tsx               # User detail
+│   │       │
+│   │       ├── categories/
+│   │       │   ├── page.tsx                   # Manage categories
+│   │       │   └── new/
+│   │       │       └── page.tsx               # Create category
+│   │       │
+│   │       ├── content/
+│   │       │   ├── about/
+│   │       │   │   └── page.tsx               # Edit about page content
+│   │       │   ├── leadership/
+│   │       │   │   ├── page.tsx               # Manage leadership profiles
+│   │       │   │   └── new/
+│   │       │   │       └── page.tsx           # Add leadership profile
+│   │       │   ├── sponsors/
+│   │       │   │   ├── page.tsx               # Manage sponsors
+│   │       │   │   └── new/
+│   │       │   │       └── page.tsx           # Add sponsor
+│   │       │   ├── testimonials/
+│   │       │   │   ├── page.tsx               # Manage testimonials
+│   │       │   │   └── new/
+│   │       │   │       └── page.tsx           # Add testimonial
+│   │       │   └── documents/
+│   │       │       └── page.tsx               # Manage foundation documents
+│   │       │
+│   │       ├── events/
+│   │       │   ├── page.tsx                   # Manage events
+│   │       │   ├── new/
+│   │       │   │   └── page.tsx               # Create event
+│   │       │   └── [id]/
+│   │       │       └── edit/
+│   │       │           └── page.tsx           # Edit event
+│   │       │
+│   │       ├── password-resets/
+│   │       │   └── page.tsx                   # Process password resets
+│   │       │
+│   │       ├── reports/
+│   │       │   └── page.tsx                   # View reports & analytics
+│   │       │
+│   │       ├── settings/
+│   │       │   └── page.tsx                   # System settings
+│   │       │
+│   │       ├── admins/
+│   │       │   ├── page.tsx                   # Manage admin users
+│   │       │   └── new/
+│   │       │       └── page.tsx               # Create admin user
+│   │       │
+│   │       ├── activity-log/
+│   │       │   └── page.tsx                   # Admin activity log
+│   │       │
+│   │       └── announcements/
+│   │           ├── page.tsx                   # Manage announcements
+│   │           └── new/
+│   │               └── page.tsx               # Create announcement
+│   │
+│   ├── components/                            # Reusable components
+│   │   ├── ui/                                # shadcn/ui components (auto-generated)
+│   │   │   ├── button.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── card.tsx
+│   │   │   └── ... (all shadcn components)
+│   │   │
+│   │   ├── layout/                            # Layout components
+│   │   │   ├── header.tsx                     # Public site header/navbar
+│   │   │   ├── footer.tsx                     # Public site footer
+│   │   │   ├── mobile-nav.tsx                 # Mobile navigation
+│   │   │   ├── dashboard-sidebar.tsx          # User dashboard sidebar
+│   │   │   ├── dashboard-header.tsx           # Dashboard top header
+│   │   │   ├── admin-sidebar.tsx              # Admin panel sidebar
+│   │   │   ├── admin-header.tsx               # Admin top header
+│   │   │   └── breadcrumb-nav.tsx             # Dynamic breadcrumbs
+│   │   │
+│   │   ├── auth/                              # Authentication components
+│   │   │   ├── login-form.tsx                 # Login form component
+│   │   │   ├── member-register-form.tsx       # Member registration form
+│   │   │   ├── client-register-form.tsx       # Client registration form
+│   │   │   ├── forgot-password-form.tsx       # Password reset form
+│   │   │   └── auth-guard.tsx                 # Client-side auth protection
+│   │   │
+│   │   ├── members/                           # Member components
+│   │   │   ├── member-card.tsx                # Member card for listings
+│   │   │   ├── member-profile-view.tsx        # Full profile display
+│   │   │   ├── member-profile-form.tsx        # Profile edit form
+│   │   │   ├── member-stats.tsx               # Member statistics display
+│   │   │   ├── specialization-badge.tsx       # Specialization badge
+│   │   │   └── member-filter.tsx              # Filter sidebar for members
+│   │   │
+│   │   ├── products/                          # Product components
+│   │   │   ├── product-card.tsx               # Product card
+│   │   │   ├── product-detail-view.tsx        # Full product display
+│   │   │   ├── product-form.tsx               # Create/edit product form
+│   │   │   ├── product-gallery.tsx            # Product image gallery
+│   │   │   ├── price-display.tsx              # Price display component
+│   │   │   └── product-filter.tsx             # Product filter sidebar
+│   │   │
+│   │   ├── services/                          # Service components
+│   │   │   ├── service-card.tsx               # Service card
+│   │   │   ├── service-detail-view.tsx        # Full service display
+│   │   │   ├── service-form.tsx               # Create/edit service form
+│   │   │   ├── service-gallery.tsx            # Service image gallery
+│   │   │   └── service-filter.tsx             # Service filter sidebar
+│   │   │
+│   │   ├── tools/                             # Tool components
+│   │   │   ├── tool-card.tsx                  # Tool card
+│   │   │   ├── tool-detail-view.tsx           # Full tool display
+│   │   │   ├── tool-form.tsx                  # Create/edit tool form
+│   │   │   └── tool-filter.tsx                # Tool filter sidebar
+│   │   │
+│   │   ├── certificates/                      # Certificate components
+│   │   │   ├── certificate-card.tsx           # Certificate display card
+│   │   │   ├── certificate-form.tsx           # Upload certificate form
+│   │   │   └── certificate-gallery.tsx        # Certificate gallery
+│   │   │
+│   │   ├── ratings/                           # Rating components
+│   │   │   ├── rating-form.tsx                # Submit rating form
+│   │   │   ├── rating-display.tsx             # Display rating stars
+│   │   │   ├── rating-summary.tsx             # Rating breakdown display
+│   │   │   ├── review-card.tsx                # Individual review card
+│   │   │   └── review-list.tsx                # List of reviews
+│   │   │
+│   │   ├── transactions/                      # Transaction components
+│   │   │   ├── transaction-form.tsx           # Record transaction form
+│   │   │   ├── transaction-card.tsx           # Transaction card
+│   │   │   └── transaction-table.tsx          # Transaction table
+│   │   │
+│   │   ├── about/                             # About page components
+│   │   │   ├── mission-vision.tsx             # Mission & vision section
+│   │   │   ├── leadership-card.tsx            # Leadership profile card
+│   │   │   ├── leadership-grid.tsx            # Leadership grid layout
+│   │   │   ├── objectives-section.tsx         # Objectives display
+│   │   │   ├── foundation-documents.tsx       # Documents display
+│   │   │   └── contact-section.tsx            # Contact information
+│   │   │
+│   │   ├── sponsors/                          # Sponsor components
+│   │   │   ├── sponsor-card.tsx               # Sponsor card
+│   │   │   └── sponsor-grid.tsx               # Sponsors grid layout
+│   │   │
+│   │   ├── testimonials/                      # Testimonial components
+│   │   │   ├── testimonial-card.tsx           # Testimonial card
+│   │   │   └── testimonial-slider.tsx         # Testimonial carousel
+│   │   │
+│   │   ├── events/                            # Event components
+│   │   │   ├── event-card.tsx                 # Event card
+│   │   │   ├── event-detail-view.tsx          # Full event display
+│   │   │   ├── event-gallery.tsx              # Event photo gallery
+│   │   │   ├── event-agenda.tsx               # Event agenda display
+│   │   │   └── event-filter.tsx               # Event filter
+│   │   │
+│   │   ├── home/                              # Home page components
+│   │   │   ├── hero-section.tsx               # Hero banner
+│   │   │   ├── featured-members.tsx           # Featured members section
+│   │   │   ├── featured-products.tsx          # Featured products section
+│   │   │   ├── featured-services.tsx          # Featured services section
+│   │   │   ├── stats-section.tsx              # Statistics counters
+│   │   │   ├── testimonials-section.tsx       # Home testimonials
+│   │   │   ├── upcoming-events.tsx            # Upcoming events section
+│   │   │   ├── sponsors-section.tsx           # Sponsors logos section
+│   │   │   └── cta-section.tsx                # Call-to-action section
+│   │   │
+│   │   ├── search/                            # Search components
+│   │   │   ├── search-bar.tsx                 # Global search bar
+│   │   │   ├── search-results.tsx             # Search results display
+│   │   │   └── search-filters.tsx             # Search filter panel
+│   │   │
+│   │   ├── notifications/                     # Notification components
+│   │   │   ├── notification-bell.tsx          # Notification bell icon
+│   │   │   ├── notification-dropdown.tsx      # Notification dropdown
+│   │   │   └── notification-list.tsx          # Full notifications page
+│   │   │
+│   │   ├── admin/                             # Admin-specific components
+│   │   │   ├── verification-card.tsx          # Verification review card
+│   │   │   ├── verification-document-viewer.tsx # Document viewer
+│   │   │   ├── stats-cards.tsx                # Dashboard stat cards
+│   │   │   ├── recent-activity.tsx            # Recent admin activity
+│   │   │   ├── user-table.tsx                 # User management table
+│   │   │   ├── content-editor.tsx             # Rich text content editor
+│   │   │   ├── category-tree.tsx              # Category hierarchy tree
+│   │   │   └── data-table.tsx                 # Reusable data table
+│   │   │
+│   │   └── shared/                            # Shared/common components
+│   │       ├── image-upload.tsx               # Image upload with preview
+│   │       ├── multi-image-upload.tsx         # Multiple image upload
+│   │       ├── phone-input.tsx                # Phone number input
+│   │       ├── state-lga-select.tsx           # State & LGA dropdown
+│   │       ├── category-select.tsx            # Category selector
+│   │       ├── pricing-input.tsx              # Pricing type & amount input
+│   │       ├── loading-spinner.tsx            # Loading spinner
+│   │       ├── empty-state.tsx                # Empty state display
+│   │       ├── error-display.tsx              # Error display
+│   │       ├── confirm-dialog.tsx             # Confirmation dialog
+│   │       ├── pagination-controls.tsx        # Pagination controls
+│   │       ├── status-badge.tsx               # Status badges
+│   │       ├── date-display.tsx               # Date formatting display
+│   │       ├── back-button.tsx                # Back navigation button
+│   │       ├── page-header.tsx                # Consistent page headers
+│   │       └── seo-head.tsx                   # SEO meta tags
+│   │
+│   ├── lib/                                   # Utility libraries
+│   │   ├── api/                               # API client
+│   │   │   ├── client.ts                      # Axios instance with interceptors
+│   │   │   ├── auth.api.ts                    # Auth API calls
+│   │   │   ├── members.api.ts                 # Members API calls
+│   │   │   ├── products.api.ts                # Products API calls
+│   │   │   ├── services.api.ts                # Services API calls
+│   │   │   ├── tools.api.ts                   # Tools API calls
+│   │   │   ├── certificates.api.ts            # Certificates API calls
+│   │   │   ├── ratings.api.ts                 # Ratings API calls
+│   │   │   ├── transactions.api.ts            # Transactions API calls
+│   │   │   ├── about.api.ts                   # About content API calls
+│   │   │   ├── sponsors.api.ts                # Sponsors API calls
+│   │   │   ├── testimonials.api.ts            # Testimonials API calls
+│   │   │   ├── events.api.ts                  # Events API calls
+│   │   │   ├── categories.api.ts              # Categories API calls
+│   │   │   ├── notifications.api.ts           # Notifications API calls
+│   │   │   ├── search.api.ts                  # Search API calls
+│   │   │   ├── upload.api.ts                  # File upload API calls
+│   │   │   ├── location.api.ts                # States/LGAs API calls
+│   │   │   ├── admin.api.ts                   # Admin-specific API calls
+│   │   │   └── settings.api.ts                # Settings API calls
+│   │   │
+│   │   ├── utils.ts                           # General utility functions
+│   │   ├── constants.ts                       # Frontend constants
+│   │   ├── validations.ts                     # Zod validation schemas
+│   │   └── format.ts                          # Formatting helpers
+│   │
+│   ├── hooks/                                 # Custom React hooks
+│   │   ├── use-auth.ts                        # Authentication hook
+│   │   ├── use-current-user.ts                # Get current user data
+│   │   ├── use-members.ts                     # Members data hook
+│   │   ├── use-products.ts                    # Products data hook
+│   │   ├── use-services.ts                    # Services data hook
+│   │   ├── use-tools.ts                       # Tools data hook
+│   │   ├── use-categories.ts                  # Categories data hook
+│   │   ├── use-ratings.ts                     # Ratings data hook
+│   │   ├── use-notifications.ts               # Notifications hook
+│   │   ├── use-upload.ts                      # File upload hook
+│   │   ├── use-search.ts                      # Search hook
+│   │   ├── use-location.ts                    # States/LGAs hook
+│   │   ├── use-pagination.ts                  # Pagination hook
+│   │   ├── use-debounce.ts                    # Debounce hook
+│   │   ├── use-media-query.ts                 # Responsive hook
+│   │   └── use-local-storage.ts               # Local storage hook
+│   │
+│   ├── store/                                 # Zustand state stores
+│   │   ├── auth-store.ts                      # Authentication state
+│   │   ├── notification-store.ts              # Notification state
+│   │   ├── search-store.ts                    # Search state
+│   │   └── ui-store.ts                        # UI state (sidebar, modals)
+│   │
+│   ├── providers/                             # React context providers
+│   │   ├── query-provider.tsx                 # React Query provider
+│   │   ├── auth-provider.tsx                  # Auth context provider
+│   │   └── toast-provider.tsx                 # Toast notification provider
+│   │
+│   └── types/                                 # TypeScript type definitions
+│       ├── index.ts                           # Main types export
+│       ├── user.types.ts                      # User-related types
+│       ├── member.types.ts                    # Member types
+│       ├── product.types.ts                   # Product types
+│       ├── service.types.ts                   # Service types
+│       ├── tool.types.ts                      # Tool types
+│       ├── certificate.types.ts               # Certificate types
+│       ├── rating.types.ts                    # Rating types
+│       ├── transaction.types.ts               # Transaction types
+│       ├── category.types.ts                  # Category types
+│       ├── about.types.ts                     # About page types
+│       ├── event.types.ts                     # Event types
+│       ├── sponsor.types.ts                   # Sponsor types
+│       ├── testimonial.types.ts               # Testimonial types
+│       ├── notification.types.ts              # Notification types
+│       ├── admin.types.ts                     # Admin types
+│       └── api.types.ts                       # API response types
+│
+├── .env.local                                 # Local environment variables
+├── .env.example                               # Example env file
+├── .eslintrc.json                             # ESLint config
+├── .gitignore                                 # Git ignore
+├── components.json                            # shadcn/ui config
+├── next.config.js                             # Next.js configuration
+├── postcss.config.js                          # PostCSS config
+├── tailwind.config.ts                         # Tailwind configuration
+├── tsconfig.json                              # TypeScript config
+├── vercel.json                                # Vercel deployment config
+└── README.md                                  # Documentation
+[file content end]
