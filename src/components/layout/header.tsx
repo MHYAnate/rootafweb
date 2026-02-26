@@ -26,6 +26,7 @@ import {
 import { useAuthStore } from '@/store/auth-store';
 import { PremiumAvatar } from '@/components/shared/premium-avatar';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 const navLinks = [
   { href: '/members', label: 'Members' },
@@ -68,11 +69,11 @@ export function Header() {
             className="h-9 w-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105"
             style={{ background: 'var(--gradient-premium)' }}
           >
-            <Leaf className="h-5 w-5 text-white" />
+            <Image src="/image/rootaf.jpeg" alt="RootAF Logo" width={20} height={20} />
           </div>
           <div className="hidden sm:block">
             <span className="text-xl font-bold text-gradient-premium">
-              URAFD
+              RootAF
             </span>
           </div>
         </Link>
