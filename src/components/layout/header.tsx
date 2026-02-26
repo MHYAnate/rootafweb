@@ -69,7 +69,7 @@ export function Header() {
             className="h-9 w-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105"
             style={{ background: 'var(--gradient-premium)' }}
           >
-            <Image src="/image/rootaf.jpeg" alt="RootAF Logo" width={20} height={20} />
+            <Image src="/images/rootaf.jpeg" alt="RootAF Logo" width={20} height={20} />
           </div>
           <div className="hidden sm:block">
             <span className="text-xl font-bold text-gradient-premium">

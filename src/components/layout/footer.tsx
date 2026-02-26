@@ -20,10 +20,10 @@ export function Footer() {
                 className="h-10 w-10 rounded-xl flex items-center justify-center"
                 style={{ background: 'var(--gradient-premium)' }}
               >
-                <Image src="/image/rootaf.jpeg" alt="RootAF Logo" width={20} height={20} />
+                <Image src="/images/rootaf.jpeg" alt="RootAF Logo" width={20} height={20} />
               </div>
               <span className="text-xl font-bold text-white">
-                URAFD
+                RootAF
               </span>
             </div>
             <p className="text-sm leading-relaxed text-green-200/80">
