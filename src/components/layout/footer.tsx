@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Phone, Mail, MapPin, Leaf, ArrowUpRight } from 'lucide-react';
+import Image from 'next/image';
 
 export function Footer() {
   return (
@@ -19,7 +20,7 @@ export function Footer() {
                 className="h-10 w-10 rounded-xl flex items-center justify-center"
                 style={{ background: 'var(--gradient-premium)' }}
               >
-                <Leaf className="h-5 w-5 text-white" />
+                <Image src="/image/rootaf.jpeg" alt="RootAF Logo" width={20} height={20} />
               </div>
               <span className="text-xl font-bold text-white">
                 URAFD
