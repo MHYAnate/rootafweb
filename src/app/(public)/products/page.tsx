@@ -16,6 +16,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, Package, SlidersHorizontal } from 'lucide-react';
 
+// Constants for "all" selection values
+const ALL_CATEGORIES = 'all-categories';
+const ALL_PRICING = 'all-pricing';
+
 export default function ProductsPage() {
   const { page, setPage } = usePagination();
   const [search, setSearch] = useState('');
@@ -31,6 +35,18 @@ export default function ProductsPage() {
     categoryId: categoryId || undefined,
     pricingType: pricingType || undefined,
   });
+
+  // Handler for category change - converts "all" value to empty string
+  const handleCategoryChange = (value: string) => {
+    setCategoryId(value === ALL_CATEGORIES ? '' : value);
+  };
+
+  // Handler for pricing type change - converts "all" value to empty string
+  const handlePricingTypeChange = (value: string) => {
+    setPricingType(value === ALL_PRICING ? '' : value);
+  };
+
+  console.log('Products data:', data);
 
   return (
     <div className="container-custom py-10">
@@ -48,21 +64,42 @@ export default function ProductsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 h-11 rounded-lg" />
+            <Input 
+              placeholder="Search products..." 
+              value={search} 
+              onChange={(e) => setSearch(e.target.value)} 
+              className="pl-10 h-11 rounded-lg" 
+            />
           </div>
-          <Select value={categoryId} onValueChange={setCategoryId}>
-            <SelectTrigger className="h-11 rounded-lg"><SelectValue placeholder="All Categories" /></SelectTrigger>
+          
+          {/* Category Filter */}
+          <Select 
+            value={categoryId || ALL_CATEGORIES} 
+            onValueChange={handleCategoryChange}
+          >
+            <SelectTrigger className="h-11 rounded-lg">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value={ALL_CATEGORIES}>All Categories</SelectItem>
               {categoriesData?.data?.map((cat: any) => (
-                <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                <SelectItem key={cat.id} value={cat.id}>
+                  {cat.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Select value={pricingType} onValueChange={setPricingType}>
-            <SelectTrigger className="h-11 rounded-lg"><SelectValue placeholder="All Pricing" /></SelectTrigger>
+          
+          {/* Pricing Type Filter */}
+          <Select 
+            value={pricingType || ALL_PRICING} 
+            onValueChange={handlePricingTypeChange}
+          >
+            <SelectTrigger className="h-11 rounded-lg">
+              <SelectValue placeholder="All Pricing" />
+            </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Pricing</SelectItem>
+              <SelectItem value={ALL_PRICING}>All Pricing</SelectItem>
               <SelectItem value="FIXED">Fixed Price</SelectItem>
               <SelectItem value="NEGOTIABLE">Negotiable</SelectItem>
               <SelectItem value="BOTH">Both</SelectItem>
@@ -80,20 +117,37 @@ export default function ProductsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {data?.data?.map((product: any, idx: number) => (
               <Link key={product.id} href={`/products/${product.id}`}>
-                <Card className="card-premium h-full overflow-hidden animate-fade-up" style={{ animationDelay: `${(idx % 4) * 0.05}s` }}>
+                <Card 
+                  className="card-premium h-full overflow-hidden animate-fade-up" 
+                  style={{ animationDelay: `${(idx % 4) * 0.05}s` }}
+                >
                   <div className="aspect-[4/3] bg-muted/30 flex items-center justify-center overflow-hidden">
                     {product.images?.[0]?.thumbnailUrl ? (
-                      <img src={product.images[0].thumbnailUrl} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                      <img 
+                        src={product.images[0].thumbnailUrl} 
+                        alt={product.name} 
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" 
+                      />
                     ) : (
                       <Package className="h-12 w-12 text-muted-foreground/20" />
                     )}
                   </div>
                   <CardContent className="p-4">
-                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{product.category?.name}</p>
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                      {product.category?.name}
+                    </p>
                     <h3 className="font-semibold mt-1 line-clamp-1">{product.name}</h3>
-                    <p className="text-xs text-muted-foreground mt-1">by {product.member?.user?.fullName}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      by {product.member?.user?.fullName}
+                    </p>
                     <div className="mt-3">
-                      <PriceDisplay pricingType={product.pricingType} amount={product.priceAmount ? Number(product.priceAmount) : null} displayText={product.priceDisplayText} className="text-sm font-bold text-primary" showBadge />
+                      <PriceDisplay 
+                        pricingType={product.pricingType} 
+                        amount={product.priceAmount ? Number(product.priceAmount) : null} 
+                        displayText={product.priceDisplayText} 
+                        className="text-sm font-bold text-primary" 
+                        showBadge 
+                      />
                     </div>
                   </CardContent>
                 </Card>

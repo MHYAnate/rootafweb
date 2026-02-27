@@ -23,6 +23,10 @@ import { PROVIDER_TYPE_MAP, NIGERIAN_STATES } from '@/lib/constants';
 import { Search, Users, MapPin, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
 
+// Constants for "all" selection values
+const ALL_TYPES = 'all-types';
+const ALL_STATES = 'all-states';
+
 export default function MembersPage() {
   const { page, setPage } = usePagination();
   const [search, setSearch] = useState('');
@@ -37,6 +41,16 @@ export default function MembersPage() {
     providerType: providerType || undefined,
     state: state || undefined,
   });
+
+  // Handler for provider type change
+  const handleProviderTypeChange = (value: string) => {
+    setProviderType(value === ALL_TYPES ? '' : value);
+  };
+
+  // Handler for state change
+  const handleStateChange = (value: string) => {
+    setState(value === ALL_STATES ? '' : value);
+  };
 
   return (
     <div className="container-custom py-10">
@@ -66,23 +80,33 @@ export default function MembersPage() {
               className="pl-10 h-11 rounded-lg"
             />
           </div>
-          <Select value={providerType} onValueChange={setProviderType}>
+          
+          {/* Provider Type Filter */}
+          <Select 
+            value={providerType || ALL_TYPES} 
+            onValueChange={handleProviderTypeChange}
+          >
             <SelectTrigger className="h-11 rounded-lg">
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value={ALL_TYPES}>All Types</SelectItem>
               <SelectItem value="FARMER">🌾 Farmers</SelectItem>
               <SelectItem value="ARTISAN">🔨 Artisans</SelectItem>
               <SelectItem value="BOTH">🌾🔨 Both</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={state} onValueChange={setState}>
+          
+          {/* State Filter */}
+          <Select 
+            value={state || ALL_STATES} 
+            onValueChange={handleStateChange}
+          >
             <SelectTrigger className="h-11 rounded-lg">
               <SelectValue placeholder="All States" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All States</SelectItem>
+              <SelectItem value={ALL_STATES}>All States</SelectItem>
               {NIGERIAN_STATES.map((s) => (
                 <SelectItem key={s} value={s}>
                   {s}
@@ -109,8 +133,7 @@ export default function MembersPage() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {data?.data?.map((member: any, idx: number) => {
-              const providerInfo =
-                PROVIDER_TYPE_MAP[member.providerType];
+              const providerInfo = PROVIDER_TYPE_MAP[member.providerType];
               return (
                 <Link
                   key={member.id}
@@ -128,8 +151,7 @@ export default function MembersPage() {
                         name={member.user?.fullName || ''}
                         size="lg"
                         verified={
-                          member.user?.verificationStatus ===
-                          'VERIFIED'
+                          member.user?.verificationStatus === 'VERIFIED'
                         }
                         className="mx-auto"
                       />
