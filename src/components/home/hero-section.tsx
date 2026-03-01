@@ -63,11 +63,11 @@ export function HeroSection() {
           </h1>
 
           {/* Description */}
-          <p className="text-lg md:text-xl mt-6 text-green-100/80 max-w-2xl leading-relaxed animate-fade-up stagger-2">
+          {/* <p className="text-lg md:text-xl mt-6 text-green-100/80 max-w-2xl leading-relaxed animate-fade-up stagger-2">
             Connecting skilled farmers and artisans with customers seeking
             quality products, services, and tools. Join our growing community
             and unlock new opportunities.
-          </p>
+          </p> */}
 
           {/* CTA Buttons */}
           <div className="flex flex-wrap gap-4 mt-10 animate-fade-up stagger-3">
