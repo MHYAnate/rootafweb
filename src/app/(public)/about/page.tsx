@@ -59,7 +59,7 @@ export default function AboutPage() {
   return (
     <div className="container-custom py-10">
       <PageHeader
-        title="About URAFD"
+        title="About RootAF"
         description="Uplifting the Root Artisan Farmers Development Foundation"
       />
 
