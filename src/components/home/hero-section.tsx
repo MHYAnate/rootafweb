@@ -81,14 +81,14 @@ export function HeroSection() {
           </p>
 
           {/* Trust Indicators */}
-          <div className="flex items-center gap-4 mt-6 animate-fade-up stagger-2">
+          {/* <div className="flex items-center gap-4 mt-6 animate-fade-up stagger-2">
             <div className="flex items-center gap-1">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
               ))}
             </div>
             <span className="text-sm text-white/60">Trusted by 500+ members</span>
-          </div>
+          </div> */}
 
           {/* CTA Buttons */}
           <div className="flex flex-wrap gap-4 mt-10 animate-fade-up stagger-3">
@@ -115,7 +115,7 @@ export function HeroSection() {
           </div>
 
           {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-4 mt-14 max-w-lg animate-fade-up stagger-4">
+          {/* <div className="grid grid-cols-3 gap-4 mt-14 max-w-lg animate-fade-up stagger-4">
             {[
               {
                 icon: Users,
@@ -155,7 +155,7 @@ export function HeroSection() {
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
       </div>
 
