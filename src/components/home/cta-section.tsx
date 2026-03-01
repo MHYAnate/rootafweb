@@ -60,7 +60,7 @@ export function CTASection() {
             <Button
               size="lg"
               variant="outline"
-              className="h-13 px-8 rounded-xl text-white border-white/30 hover:bg-white/10 backdrop-blur-sm font-medium"
+                   className="bg-gradient-to-r from-amber-500 to-emerald-600 h-14 px-8 rounded-xl text-white border-white/20 hover:bg-white/10 backdrop-blur-sm font-medium hover:border-white/30 transition-all"
             >
               Register as Client
             </Button>
