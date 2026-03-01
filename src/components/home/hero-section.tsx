@@ -106,7 +106,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="h-14 px-8 rounded-xl text-white border-white/20 hover:bg-white/10 backdrop-blur-sm font-medium hover:border-white/30 transition-all"
+                className="h-14 px-8 rounded-xl text-white border-white/20 hover:bg-amber/10 backdrop-blur-sm font-medium hover:border-white/30 transition-all"
               >
                 Browse Members
                 <ChevronRight className="ml-1 h-4 w-4" />
