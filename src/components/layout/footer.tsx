@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Phone, Mail, MapPin, Leaf, ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 export function Footer() {
   return (
@@ -16,12 +17,20 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2.5 mb-5">
-              <div
-                className="h-10 w-10 rounded-xl flex items-center justify-center"
-                style={{ background: 'var(--gradient-premium)' }}
-              >
-                <Image src="/images/rootaf.jpeg" alt="RootAF Logo" width={20} height={20} />
-              </div>
+              <Image
+                            src="/images/rootaf.jpeg"
+                            alt="RootAF"
+                            width={40}
+                            height={40}
+                            className={cn(
+                              'h-9 w-9 rounded-xl object-cover',
+                              'ring-1 ring-black/[0.08] dark:ring-white/[0.12]',
+                              'transition-all duration-500 ease-out',
+                              'group-hover:ring-primary/30 group-hover:shadow-lg group-hover:shadow-primary/10',
+                              'group-hover:scale-105',
+                            )}
+                            priority
+                          />
               <span className="text-xl font-bold text-white">
                 RootAF
               </span>
