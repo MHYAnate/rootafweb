@@ -11,19 +11,18 @@ import {
   Leaf,
   ChevronRight,
 } from 'lucide-react';
+import { PremiumHeroCarousel } from './premium-hero-carousel';
 
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden">
-      {/* Background Gradient */}
-      <div className="absolute inset-0" style={{ background: 'var(--gradient-hero)' }} />
+      {/* Premium Carousel Background */}
+      <PremiumHeroCarousel />
 
       {/* Pattern Overlay */}
-      <div className="absolute inset-0 dot-pattern opacity-[0.04]" />
+      <div className="absolute inset-0 dot-pattern opacity-[0.02]" />
 
-      {/* Gold Accent Shapes */}
-      <div className="absolute top-20 right-10 h-72 w-72 rounded-full bg-amber-400/10 blur-[100px]" />
-      <div className="absolute bottom-10 left-20 h-48 w-48 rounded-full bg-blue-400/10 blur-[80px]" />
+
 
       {/* Floating Elements */}
       <div className="absolute top-1/4 right-1/4 animate-float opacity-20">
