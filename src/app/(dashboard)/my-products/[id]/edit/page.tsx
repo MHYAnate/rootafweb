@@ -237,8 +237,9 @@ export default function EditProductPage() {
               onImagesChange={setImages}
               folder="products"
               maxImages={5}
-              productId={id as string}
+              // productId={id as any}
             />
+            
           </CardContent>
         </Card>
         <Button
