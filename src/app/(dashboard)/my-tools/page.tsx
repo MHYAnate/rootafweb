@@ -1,20 +1,228 @@
+// // // src/app/(dashboard)/tools/page.tsx
+// 'use client';
+
+// import { useState, useMemo, useCallback } from 'react';
+// import { useTools } from '@/hooks/use-tools';
+// import { ToolCard } from '@/components/tools/tool-card';
+// import { ToolFilters, ToolFilterValues } from '@/components/tools/tool-filter';
+// import { PageHeader } from '@/components/shared/page-header';
+// import { LoadingSpinner } from '@/components/shared/loading-spinner';
+// import { EmptyState } from '@/components/shared/empty-state';
+// import { Button } from '@/components/ui/button';
+// import { Card } from '@/components/ui/card';
+// import { LayoutGrid, List, Wrench, ChevronLeft, ChevronRight } from 'lucide-react';
+// import { cn } from '@/lib/utils';
+// import { useDebounce } from '@/hooks/use-debounce';
+
+// export default function ToolsMarketplacePage() {
+//   const [page, setPage] = useState(1);
+//   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+//   const [filters, setFilters] = useState<ToolFilterValues>({
+//     search: '',
+//     categoryId: '',
+//     condition: '',
+//     listingPurpose: '',
+//     state: '',
+//     sortBy: 'createdAt',
+//     sortOrder: 'desc',
+//   });
+
+//   const debouncedSearch = useDebounce(filters.search, 400);
+
+//   const queryParams = useMemo(
+//     () => ({
+//       page,
+//       limit: 12,
+//       search: debouncedSearch || undefined,
+//       categoryId: filters.categoryId && filters.categoryId !== 'all' ? filters.categoryId : undefined,
+//       condition: filters.condition && filters.condition !== 'all' ? filters.condition : undefined,
+//       listingPurpose:
+//         filters.listingPurpose && filters.listingPurpose !== 'all'
+//           ? filters.listingPurpose
+//           : undefined,
+//       state: filters.state && filters.state !== 'all' ? filters.state : undefined,
+//       sortBy: filters.sortBy || undefined,
+//       sortOrder: filters.sortOrder || undefined,
+//     }),
+//     [page, debouncedSearch, filters],
+//   );
+
+//   const { data, isLoading } = useTools(queryParams);
+
+//   const tools = data?.data || [];
+//   const meta = data?.meta;
+
+//   const handleFiltersChange = useCallback((newFilters: ToolFilterValues) => {
+//     setFilters(newFilters);
+//     setPage(1);
+//   }, []);
+
+//   return (
+//     <div className="space-y-6">
+//       {/* Header */}
+//       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+//         <PageHeader
+//           title="Tools Marketplace"
+//           description="Browse farming and artisan tools available for sale and lease"
+//         />
+//         <div className="flex items-center gap-1 border rounded-lg p-1">
+//           <Button
+//             variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+//             size="icon"
+//             className="h-8 w-8"
+//             onClick={() => setViewMode('grid')}
+//           >
+//             <LayoutGrid className="h-4 w-4" />
+//           </Button>
+//           <Button
+//             variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+//             size="icon"
+//             className="h-8 w-8"
+//             onClick={() => setViewMode('list')}
+//           >
+//             <List className="h-4 w-4" />
+//           </Button>
+//         </div>
+//       </div>
+
+//       {/* Layout: Sidebar + Content */}
+//       <div className="flex flex-col lg:flex-row gap-6">
+//         {/* Desktop Sidebar */}
+//         <aside className="hidden lg:block w-64 shrink-0">
+//           <Card className="card-premium p-4 sticky top-24">
+//             <ToolFilters
+//               filters={filters}
+//               onFiltersChange={handleFiltersChange}
+//               totalResults={meta?.total}
+//             />
+//           </Card>
+//         </aside>
+
+//         {/* Main Content */}
+//         <div className="flex-1 min-w-0 space-y-4">
+//           {/* Mobile Filters */}
+//           <div className="lg:hidden">
+//             <ToolFilters
+//               filters={filters}
+//               onFiltersChange={handleFiltersChange}
+//               totalResults={meta?.total}
+//             />
+//           </div>
+
+//           {/* Results */}
+//           {isLoading ? (
+//             <LoadingSpinner size="lg" className="py-20" />
+//           ) : tools.length === 0 ? (
+//             <EmptyState
+//               icon={<Wrench className="h-12 w-12" /> as any}
+//               title="No tools found"
+//               description="Try adjusting your filters or search terms"
+//               action={
+//                 <Button
+//                   variant="outline"
+//                   onClick={() =>
+//                     handleFiltersChange({
+//                       search: '',
+//                       categoryId: '',
+//                       condition: '',
+//                       listingPurpose: '',
+//                       state: '',
+//                       sortBy: 'createdAt',
+//                       sortOrder: 'desc',
+//                     })
+//                   }
+//                 >
+//                   Clear Filters
+//                 </Button>
+//               }
+//             />
+//           ) : (
+//             <>
+//               <div
+//                 className={cn(
+//                   viewMode === 'grid'
+//                     ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'
+//                     : 'space-y-4',
+//                 )}
+//               >
+//                 {tools.map((tool: any) => (
+//                   <ToolCard key={tool.id} tool={tool} variant={viewMode} />
+//                 ))}
+//               </div>
+
+//               {/* Pagination */}
+//               {meta && meta.totalPages > 1 && (
+//                 <div className="flex items-center justify-center gap-3 pt-8">
+//                   <Button
+//                     variant="outline"
+//                     size="sm"
+//                     className="gap-1"
+//                     disabled={page <= 1}
+//                     onClick={() => setPage((p) => p - 1)}
+//                   >
+//                     <ChevronLeft className="h-4 w-4" />
+//                     Previous
+//                   </Button>
+
+//                   <div className="flex items-center gap-1">
+//                     {Array.from({ length: Math.min(meta.totalPages, 5) }, (_, i) => {
+//                       const pageNum =
+//                         meta.totalPages <= 5
+//                           ? i + 1
+//                           : page <= 3
+//                             ? i + 1
+//                             : page >= meta.totalPages - 2
+//                               ? meta.totalPages - 4 + i
+//                               : page - 2 + i;
+//                       return (
+//                         <Button
+//                           key={pageNum}
+//                           variant={page === pageNum ? 'default' : 'ghost'}
+//                           size="icon"
+//                           className="h-8 w-8 text-sm"
+//                           onClick={() => setPage(pageNum)}
+//                         >
+//                           {pageNum}
+//                         </Button>
+//                       );
+//                     })}
+//                   </div>
+
+//                   <Button
+//                     variant="outline"
+//                     size="sm"
+//                     className="gap-1"
+//                     disabled={page >= meta.totalPages}
+//                     onClick={() => setPage((p) => p + 1)}
+//                   >
+//                     Next
+//                     <ChevronRight className="h-4 w-4" />
+//                   </Button>
+//                 </div>
+//               )}
+//             </>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// src/app/(dashboard)/my-tools/page.tsx
 'use client';
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useCreateTool } from '@/hooks/use-tools';
-import { toolSchema, ToolFormData } from '@/lib/validations';
-import { BackButton } from '@/components/shared/back-button';
+import { useState, useMemo } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useMyTools, useDeleteTool } from '@/hooks/use-tools';
 import { PageHeader } from '@/components/shared/page-header';
-import { CategorySelect } from '@/components/shared/category-select';
-import { MultiImageUpload } from '@/components/shared/multi-image-upload';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { LoadingSpinner } from '@/components/shared/loading-spinner';
+import { EmptyState } from '@/components/shared/empty-state';
+import { ToolStatsBar } from '@/components/tools/tool-stats-bar';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -22,453 +230,354 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Loader2, Save } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  Wrench,
+  MapPin,
+  Package,
+  MoreVertical,
+  Search,
+  ExternalLink,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 
-const CONDITION_OPTIONS = [
-  { value: 'NEW', label: 'New' },
-  { value: 'FAIRLY_USED', label: 'Fairly Used' },
-  { value: 'USED', label: 'Used' },
-  { value: 'REFURBISHED', label: 'Refurbished' },
-];
+const conditionColors: Record<string, string> = {
+  NEW: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
+  FAIRLY_USED: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  USED: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+  REFURBISHED: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+};
 
-const PURPOSE_OPTIONS = [
-  { value: 'SALE', label: 'For Sale' },
-  { value: 'LEASE', label: 'For Lease' },
-  { value: 'BOTH', label: 'Sale & Lease' },
-];
+const purposeConfig: Record<string, { label: string; className: string }> = {
+  SALE: { label: 'Sale', className: 'bg-green-100 text-green-800' },
+  LEASE: { label: 'Lease', className: 'bg-sky-100 text-sky-800' },
+  BOTH: { label: 'Sale & Lease', className: 'bg-violet-100 text-violet-800' },
+};
 
-const PRICING_OPTIONS = [
-  { value: 'FIXED', label: 'Fixed' },
-  { value: 'NEGOTIABLE', label: 'Negotiable' },
-  { value: 'BOTH', label: 'Both' },
-];
+function formatPrice(amount: number | null | undefined) {
+  if (!amount) return '—';
+  return `₦${Number(amount).toLocaleString()}`;
+}
 
-const LEASE_PERIOD_OPTIONS = [
-  { value: 'HOURLY', label: 'Per Hour' },
-  { value: 'DAILY', label: 'Per Day' },
-  { value: 'WEEKLY', label: 'Per Week' },
-  { value: 'MONTHLY', label: 'Per Month' },
-  { value: 'SEASONAL', label: 'Per Season' },
-];
+export default function MyToolsPage() {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const { data, isLoading } = useMyTools({ page, limit: 12 });
+  const { mutate: deleteTool, isPending: isDeleting } = useDeleteTool();
 
-const DEPOSIT_OPTIONS = [
-  { value: 'REQUIRED', label: 'Required' },
-  { value: 'NOT_REQUIRED', label: 'Not Required' },
-  { value: 'NEGOTIABLE', label: 'Negotiable' },
-];
+  const allTools = data?.data || [];
+  const meta = data?.meta;
 
-export default function NewToolPage() {
-  const router = useRouter();
-  const { mutate: createTool, isPending } = useCreateTool();
-  const [images, setImages] = useState<any[]>([]);
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<ToolFormData>({
-    resolver: zodResolver(toolSchema),
-    defaultValues: {
-      condition: 'NEW',
-      listingPurpose: 'SALE',
-      salePricingType: 'FIXED',
-      leasePricingType: 'FIXED',
-      depositRequired: 'NOT_REQUIRED',
-      deliveryAvailable: false,
-      quantityAvailable: 1,
-    },
-  });
-
-  const listingPurpose = watch('listingPurpose');
-  const depositRequired = watch('depositRequired');
-  const showSale = listingPurpose === 'SALE' || listingPurpose === 'BOTH';
-  const showLease = listingPurpose === 'LEASE' || listingPurpose === 'BOTH';
-
-  const onSubmit = (data: ToolFormData) => {
-    // Strip irrelevant pricing fields based on purpose
-    const payload: any = { ...data };
-    if (!showSale) {
-      delete payload.salePricingType;
-      delete payload.salePrice;
+  // Client-side filtering for quick search
+  const tools = useMemo(() => {
+    let filtered = allTools;
+    if (search) {
+      const q = search.toLowerCase();
+      filtered = filtered.filter(
+        (t: any) =>
+          t.name?.toLowerCase().includes(q) ||
+          t.category?.name?.toLowerCase().includes(q),
+      );
     }
-    if (!showLease) {
-      delete payload.leasePricingType;
-      delete payload.leaseRate;
-      delete payload.leaseRatePeriod;
-      delete payload.depositRequired;
-      delete payload.depositAmount;
+    if (statusFilter === 'active') {
+      filtered = filtered.filter((t: any) => t.isActive);
+    } else if (statusFilter === 'sale') {
+      filtered = filtered.filter(
+        (t: any) => t.listingPurpose === 'SALE' || t.listingPurpose === 'BOTH',
+      );
+    } else if (statusFilter === 'lease') {
+      filtered = filtered.filter(
+        (t: any) => t.listingPurpose === 'LEASE' || t.listingPurpose === 'BOTH',
+      );
     }
-    if (depositRequired !== 'REQUIRED') {
-      delete payload.depositAmount;
-    }
+    return filtered;
+  }, [allTools, search, statusFilter]);
 
-    createTool(
-      {
-        ...payload,
-        images: images.map((img, idx) => ({
-          ...img,
-          isPrimary: idx === 0,
-        })),
-      },
-      { onSuccess: () => router.push('/my-tools') }
-    );
-  };
+  // Compute stats
+  const stats = useMemo(
+    () => ({
+      total: allTools.length,
+      active: allTools.filter((t: any) => t.isActive).length,
+      totalViews: allTools.reduce((sum: number, t: any) => sum + (t.viewCount || 0), 0),
+      forSale: allTools.filter(
+        (t: any) => t.listingPurpose === 'SALE' || t.listingPurpose === 'BOTH',
+      ).length,
+      forLease: allTools.filter(
+        (t: any) => t.listingPurpose === 'LEASE' || t.listingPurpose === 'BOTH',
+      ).length,
+    }),
+    [allTools],
+  );
 
   return (
     <div className="space-y-6">
-      <BackButton href="/my-tools" />
-      <PageHeader title="List New Tool" />
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <PageHeader title="My Tools" description="Manage your tool listings" />
+        <Link href="/my-tools/new">
+          <Button className="btn-premium rounded-xl gap-2">
+            <Plus className="h-4 w-4" />
+            List New Tool
+          </Button>
+        </Link>
+      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* ── Basic Details ── */}
-        <Card className="card-premium">
-          <CardHeader>
-            <CardTitle>Tool Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Tool Name *</Label>
-              <Input className="h-11 rounded-lg" {...register('name')} />
-              {errors.name && (
-                <p className="text-sm text-destructive">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
+      {isLoading ? (
+        <LoadingSpinner size="lg" className="py-20" />
+      ) : allTools.length === 0 ? (
+        <EmptyState
+          icon={<Wrench className="h-12 w-12" /> as any}
+          title="No tools listed yet"
+          description="List your first tool to start selling or leasing to the community"
+          action={
+            <Link href="/my-tools/new">
+              <Button className="btn-premium rounded-xl gap-2">
+                <Plus className="h-4 w-4" />
+                List Your First Tool
+              </Button>
+            </Link>
+          }
+        />
+      ) : (
+        <>
+          {/* Stats */}
+          <ToolStatsBar stats={stats} />
 
-            <div className="space-y-2">
-              <Label>Description *</Label>
-              <Textarea
-                className="rounded-lg min-h-[120px]"
-                placeholder="Describe the tool, its capabilities, and any relevant details..."
-                {...register('description')}
-              />
-              {errors.description && (
-                <p className="text-sm text-destructive">
-                  {errors.description.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Short Description</Label>
+          {/* Search & Filter Bar */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                className="h-11 rounded-lg"
-                placeholder="Brief summary (optional)"
-                {...register('shortDescription')}
+                placeholder="Search your tools..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-10 pl-10 rounded-lg"
               />
             </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="h-10 w-full sm:w-[150px] rounded-lg">
+                <SelectValue placeholder="Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Tools</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="sale">For Sale</SelectItem>
+                <SelectItem value="lease">For Lease</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-            <CategorySelect
-              type="TOOL"
-              value={watch('categoryId') || ''}
-              onChange={(v) => setValue('categoryId', v)}
-            />
-            {errors.categoryId && (
-              <p className="text-sm text-destructive">
-                {errors.categoryId.message}
-              </p>
-            )}
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Condition *</Label>
-                <Select
-                  value={watch('condition')}
-                  onValueChange={(v) => setValue('condition', v as any)}
-                >
-                  <SelectTrigger className="h-11 rounded-lg">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CONDITION_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>
-                        {o.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.condition && (
-                  <p className="text-sm text-destructive">
-                    {errors.condition.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label>Listing Purpose *</Label>
-                <Select
-                  value={watch('listingPurpose')}
-                  onValueChange={(v) =>
-                    setValue('listingPurpose', v as any)
-                  }
-                >
-                  <SelectTrigger className="h-11 rounded-lg">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PURPOSE_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>
-                        {o.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.listingPurpose && (
-                  <p className="text-sm text-destructive">
-                    {errors.listingPurpose.message}
-                  </p>
-                )}
-              </div>
+          {/* Tools Grid */}
+          {tools.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <p>No tools match your filter.</p>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label>Brand Name</Label>
-                <Input
-                  className="h-11 rounded-lg"
-                  placeholder="e.g. John Deere"
-                  {...register('brandName')}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Model Number</Label>
-                <Input
-                  className="h-11 rounded-lg"
-                  placeholder="e.g. 5075E"
-                  {...register('modelNumber')}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Quantity Available</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  className="h-11 rounded-lg"
-                  {...register('quantityAvailable', {
-                    valueAsNumber: true,
-                  })}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* ── Sale Pricing ── */}
-        {showSale && (
-          <Card className="card-premium">
-            <CardHeader>
-              <CardTitle>Sale Pricing</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Pricing Type</Label>
-                  <Select
-                    value={watch('salePricingType') || 'FIXED'}
-                    onValueChange={(v) =>
-                      setValue('salePricingType', v as any)
-                    }
-                  >
-                    <SelectTrigger className="h-11 rounded-lg">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PRICING_OPTIONS.map((o) => (
-                        <SelectItem key={o.value} value={o.value}>
-                          {o.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Sale Price (₦)</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    className="h-11 rounded-lg"
-                    placeholder="0.00"
-                    {...register('salePrice', { valueAsNumber: true })}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* ── Lease Pricing ── */}
-        {showLease && (
-          <Card className="card-premium">
-            <CardHeader>
-              <CardTitle>Lease Pricing</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>Pricing Type</Label>
-                  <Select
-                    value={watch('leasePricingType') || 'FIXED'}
-                    onValueChange={(v) =>
-                      setValue('leasePricingType', v as any)
-                    }
-                  >
-                    <SelectTrigger className="h-11 rounded-lg">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PRICING_OPTIONS.map((o) => (
-                        <SelectItem key={o.value} value={o.value}>
-                          {o.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Lease Rate (₦)</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    className="h-11 rounded-lg"
-                    placeholder="0.00"
-                    {...register('leaseRate', { valueAsNumber: true })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Rate Period</Label>
-                  <Select
-                    value={watch('leaseRatePeriod') || 'DAILY'}
-                    onValueChange={(v) =>
-                      setValue('leaseRatePeriod', v as any)
-                    }
-                  >
-                    <SelectTrigger className="h-11 rounded-lg">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {LEASE_PERIOD_OPTIONS.map((o) => (
-                        <SelectItem key={o.value} value={o.value}>
-                          {o.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Deposit Requirement</Label>
-                  <Select
-                    value={watch('depositRequired') || 'NOT_REQUIRED'}
-                    onValueChange={(v) =>
-                      setValue('depositRequired', v as any)
-                    }
-                  >
-                    <SelectTrigger className="h-11 rounded-lg">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DEPOSIT_OPTIONS.map((o) => (
-                        <SelectItem key={o.value} value={o.value}>
-                          {o.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {depositRequired === 'REQUIRED' && (
-                  <div className="space-y-2">
-                    <Label>Deposit Amount (₦)</Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      className="h-11 rounded-lg"
-                      placeholder="0.00"
-                      {...register('depositAmount', {
-                        valueAsNumber: true,
-                      })}
-                    />
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* ── Location & Delivery ── */}
-        <Card className="card-premium">
-          <CardHeader>
-            <CardTitle>Location & Delivery</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Pickup Location</Label>
-                <Input
-                  className="h-11 rounded-lg"
-                  placeholder="Address or landmark"
-                  {...register('pickupLocation')}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>State</Label>
-                <Input
-                  className="h-11 rounded-lg"
-                  placeholder="e.g. Lagos"
-                  {...register('pickupLocationState')}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Switch
-                checked={watch('deliveryAvailable') || false}
-                onCheckedChange={(v) =>
-                  setValue('deliveryAvailable', v)
-                }
-              />
-              <Label>Delivery Available</Label>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* ── Images ── */}
-        <Card className="card-premium">
-          <CardHeader>
-            <CardTitle>Images</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <MultiImageUpload
-              images={images}
-              onImagesChange={setImages}
-              folder="tools"
-              maxImages={5}
-            />
-          </CardContent>
-        </Card>
-
-        <Button
-          type="submit"
-          className="btn-premium rounded-xl gap-2"
-          disabled={isPending}
-        >
-          {isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Save className="h-4 w-4" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {tools.map((tool: any) => {
+                const primaryImage = tool.images?.[0];
+                const purpose = purposeConfig[tool.listingPurpose] || purposeConfig.SALE;
+
+                return (
+                  <Card key={tool.id} className="card-premium overflow-hidden group">
+                    {/* Image */}
+                    <div className="relative h-44 bg-muted">
+                      {primaryImage ? (
+                        <Image
+                          src={primaryImage.imageUrl || primaryImage.thumbnailUrl}
+                          alt={tool.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <Wrench className="h-10 w-10 text-muted-foreground/20" />
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2 flex gap-1.5">
+                        <Badge className={conditionColors[tool.condition] || ''}>
+                          {tool.condition?.replace('_', ' ')}
+                        </Badge>
+                      </div>
+                      <div className="absolute top-2 right-2">
+                        <Badge className={purpose.className}>{purpose.label}</Badge>
+                      </div>
+
+                      {!tool.isActive && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                          <Badge variant="destructive">Inactive</Badge>
+                        </div>
+                      )}
+                    </div>
+
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-sm line-clamp-1">{tool.name}</h3>
+                          {tool.category && (
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {tool.category.name}
+                            </p>
+                          )}
+                        </div>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <Link href={`/tools/${tool.id}`} className="gap-2">
+                                <ExternalLink className="h-3.5 w-3.5" /> View Listing
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/my-tools/${tool.id}/edit`} className="gap-2">
+                                <Edit className="h-3.5 w-3.5" /> Edit
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem
+                                  className="gap-2 text-destructive focus:text-destructive"
+                                  onSelect={(e) => e.preventDefault()}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" /> Delete
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Tool</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete &quot;{tool.name}&quot;?
+                                    This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => deleteTool(tool.id)}
+                                    disabled={isDeleting}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+
+                      {/* Price */}
+                      <div className="flex items-center gap-3">
+                        {tool.salePrice && (
+                          <span className="text-base font-bold text-primary">
+                            {formatPrice(tool.salePrice)}
+                          </span>
+                        )}
+                        {tool.leaseRate && (
+                          <span className="text-xs text-muted-foreground">
+                            {formatPrice(tool.leaseRate)}/
+                            {tool.leaseRatePeriod?.toLowerCase() || 'day'}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Meta */}
+                      <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center gap-1">
+                            <Eye className="h-3 w-3" /> {tool.viewCount || 0}
+                          </span>
+                          {tool.quantityAvailable > 1 && (
+                            <span className="flex items-center gap-1">
+                              <Package className="h-3 w-3" /> {tool.quantityAvailable}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex gap-1.5">
+                          <Link href={`/tools/${tool.id}`}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                            </Button>
+                          </Link>
+                          <Link href={`/my-tools/${tool.id}/edit`}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                            >
+                              <Edit className="h-3.5 w-3.5" />
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           )}
-          List Tool
-        </Button>
-      </form>
+
+          {/* Pagination */}
+          {meta && meta.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 pt-6">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                <ChevronLeft className="h-4 w-4" /> Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {meta.page} of {meta.totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1"
+                disabled={page >= meta.totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
