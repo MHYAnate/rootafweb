@@ -349,7 +349,7 @@ export default function MyToolsPage() {
         <LoadingSpinner size="lg" className="py-20" />
       ) : allTools.length === 0 ? (
         <EmptyState
-          icon={<Wrench className="h-12 w-12" /> as any}
+          // icon={<Wrench className="h-12 w-12" /> as any}
           title="No tools listed yet"
           description="List your first tool to start selling or leasing to the community"
           action={

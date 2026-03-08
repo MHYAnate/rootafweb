@@ -21,4 +21,9 @@ export const toolsApi = {
 
   addImage: (id: string, data: any) =>
     apiClient.post(`/tools/${id}/images`, data).then((r) => r.data),
+
+  removeImage: (toolId: string, imageId: string) =>
+    apiClient
+      .delete(`/tools/${toolId}/images/${imageId}`)
+      .then((r) => r.data),
 };

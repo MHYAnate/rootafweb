@@ -1,492 +1,23 @@
-// 'use client';
-
-// import { useForm } from 'react-hook-form';
-// import { zodResolver } from '@hookform/resolvers/zod';
-// import { useRouter } from 'next/navigation';
-// import { useState } from 'react';
-// import { useCreateTool } from '@/hooks/use-tools';
-// import { toolSchema, ToolFormData } from '@/lib/validations';
-// import { BackButton } from '@/components/shared/back-button';
-// import { PageHeader } from '@/components/shared/page-header';
-// import { CategorySelect } from '@/components/shared/category-select';
-// import { MultiImageUpload } from '@/components/shared/multi-image-upload';
-// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Input } from '@/components/ui/input';
-// import { Textarea } from '@/components/ui/textarea';
-// import { Button } from '@/components/ui/button';
-// import { Label } from '@/components/ui/label';
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from '@/components/ui/select';
-// import { Switch } from '@/components/ui/switch';
-// import { Loader2, Save } from 'lucide-react';
-
-// const CONDITION_OPTIONS = [
-//   { value: 'NEW', label: 'New' },
-//   { value: 'FAIRLY_USED', label: 'Fairly Used' },
-//   { value: 'USED', label: 'Used' },
-//   { value: 'REFURBISHED', label: 'Refurbished' },
-// ];
-
-// const PURPOSE_OPTIONS = [
-//   { value: 'SALE', label: 'For Sale' },
-//   { value: 'LEASE', label: 'For Lease' },
-//   { value: 'BOTH', label: 'Sale & Lease' },
-// ];
-
-// const PRICING_OPTIONS = [
-//   { value: 'FIXED', label: 'Fixed' },
-//   { value: 'NEGOTIABLE', label: 'Negotiable' },
-//   { value: 'BOTH', label: 'Both' },
-// ];
-
-// const LEASE_PERIOD_OPTIONS = [
-//   { value: 'HOURLY', label: 'Per Hour' },
-//   { value: 'DAILY', label: 'Per Day' },
-//   { value: 'WEEKLY', label: 'Per Week' },
-//   { value: 'MONTHLY', label: 'Per Month' },
-//   { value: 'SEASONAL', label: 'Per Season' },
-// ];
-
-// const DEPOSIT_OPTIONS = [
-//   { value: 'REQUIRED', label: 'Required' },
-//   { value: 'NOT_REQUIRED', label: 'Not Required' },
-//   { value: 'NEGOTIABLE', label: 'Negotiable' },
-// ];
-
-// export default function NewToolPage() {
-//   const router = useRouter();
-//   const { mutate: createTool, isPending } = useCreateTool();
-//   const [images, setImages] = useState<any[]>([]);
-
-//   const {
-//     register,
-//     handleSubmit,
-//     setValue,
-//     watch,
-//     formState: { errors },
-//   } = useForm<ToolFormData>({
-//     resolver: zodResolver(toolSchema),
-//     defaultValues: {
-//       condition: 'NEW',
-//       listingPurpose: 'SALE',
-//       salePricingType: 'FIXED',
-//       leasePricingType: 'FIXED',
-//       depositRequired: 'NOT_REQUIRED',
-//       deliveryAvailable: false,
-//       quantityAvailable: 1,
-//     },
-//   });
-
-//   const listingPurpose = watch('listingPurpose');
-//   const depositRequired = watch('depositRequired');
-//   const showSale = listingPurpose === 'SALE' || listingPurpose === 'BOTH';
-//   const showLease = listingPurpose === 'LEASE' || listingPurpose === 'BOTH';
-
-//   const onSubmit = (data: ToolFormData) => {
-//     // Strip irrelevant pricing fields based on purpose
-//     const payload: any = { ...data };
-//     if (!showSale) {
-//       delete payload.salePricingType;
-//       delete payload.salePrice;
-//     }
-//     if (!showLease) {
-//       delete payload.leasePricingType;
-//       delete payload.leaseRate;
-//       delete payload.leaseRatePeriod;
-//       delete payload.depositRequired;
-//       delete payload.depositAmount;
-//     }
-//     if (depositRequired !== 'REQUIRED') {
-//       delete payload.depositAmount;
-//     }
-
-//     createTool(
-//       {
-//         ...payload,
-//         images: images.map((img, idx) => ({
-//           ...img,
-//           isPrimary: idx === 0,
-//         })),
-//       },
-//       { onSuccess: () => router.push('/my-tools') }
-//     );
-//   };
-
-//   return (
-//     <div className="space-y-6">
-//       <BackButton href="/my-tools" />
-//       <PageHeader title="List New Tool" />
-
-//       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-//         {/* ── Basic Details ── */}
-//         <Card className="card-premium">
-//           <CardHeader>
-//             <CardTitle>Tool Details</CardTitle>
-//           </CardHeader>
-//           <CardContent className="space-y-4">
-//             <div className="space-y-2">
-//               <Label>Tool Name *</Label>
-//               <Input className="h-11 rounded-lg" {...register('name')} />
-//               {errors.name && (
-//                 <p className="text-sm text-destructive">
-//                   {errors.name.message}
-//                 </p>
-//               )}
-//             </div>
-
-//             <div className="space-y-2">
-//               <Label>Description *</Label>
-//               <Textarea
-//                 className="rounded-lg min-h-[120px]"
-//                 placeholder="Describe the tool, its capabilities, and any relevant details..."
-//                 {...register('description')}
-//               />
-//               {errors.description && (
-//                 <p className="text-sm text-destructive">
-//                   {errors.description.message}
-//                 </p>
-//               )}
-//             </div>
-
-//             <div className="space-y-2">
-//               <Label>Short Description</Label>
-//               <Input
-//                 className="h-11 rounded-lg"
-//                 placeholder="Brief summary (optional)"
-//                 {...register('shortDescription')}
-//               />
-//             </div>
-
-//             <CategorySelect
-//               type="TOOL"
-//               value={watch('categoryId') || ''}
-//               onChange={(v) => setValue('categoryId', v)}
-//             />
-//             {errors.categoryId && (
-//               <p className="text-sm text-destructive">
-//                 {errors.categoryId.message}
-//               </p>
-//             )}
-
-//             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-//               <div className="space-y-2">
-//                 <Label>Condition *</Label>
-//                 <Select
-//                   value={watch('condition')}
-//                   onValueChange={(v) => setValue('condition', v as any)}
-//                 >
-//                   <SelectTrigger className="h-11 rounded-lg">
-//                     <SelectValue />
-//                   </SelectTrigger>
-//                   <SelectContent>
-//                     {CONDITION_OPTIONS.map((o) => (
-//                       <SelectItem key={o.value} value={o.value}>
-//                         {o.label}
-//                       </SelectItem>
-//                     ))}
-//                   </SelectContent>
-//                 </Select>
-//                 {errors.condition && (
-//                   <p className="text-sm text-destructive">
-//                     {errors.condition.message}
-//                   </p>
-//                 )}
-//               </div>
-
-//               <div className="space-y-2">
-//                 <Label>Listing Purpose *</Label>
-//                 <Select
-//                   value={watch('listingPurpose')}
-//                   onValueChange={(v) =>
-//                     setValue('listingPurpose', v as any)
-//                   }
-//                 >
-//                   <SelectTrigger className="h-11 rounded-lg">
-//                     <SelectValue />
-//                   </SelectTrigger>
-//                   <SelectContent>
-//                     {PURPOSE_OPTIONS.map((o) => (
-//                       <SelectItem key={o.value} value={o.value}>
-//                         {o.label}
-//                       </SelectItem>
-//                     ))}
-//                   </SelectContent>
-//                 </Select>
-//                 {errors.listingPurpose && (
-//                   <p className="text-sm text-destructive">
-//                     {errors.listingPurpose.message}
-//                   </p>
-//                 )}
-//               </div>
-//             </div>
-
-//             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-//               <div className="space-y-2">
-//                 <Label>Brand Name</Label>
-//                 <Input
-//                   className="h-11 rounded-lg"
-//                   placeholder="e.g. John Deere"
-//                   {...register('brandName')}
-//                 />
-//               </div>
-//               <div className="space-y-2">
-//                 <Label>Model Number</Label>
-//                 <Input
-//                   className="h-11 rounded-lg"
-//                   placeholder="e.g. 5075E"
-//                   {...register('modelNumber')}
-//                 />
-//               </div>
-//               <div className="space-y-2">
-//                 <Label>Quantity Available</Label>
-//                 <Input
-//                   type="number"
-//                   min={1}
-//                   className="h-11 rounded-lg"
-//                   {...register('quantityAvailable', {
-//                     valueAsNumber: true,
-//                   })}
-//                 />
-//               </div>
-//             </div>
-//           </CardContent>
-//         </Card>
-
-//         {/* ── Sale Pricing ── */}
-//         {showSale && (
-//           <Card className="card-premium">
-//             <CardHeader>
-//               <CardTitle>Sale Pricing</CardTitle>
-//             </CardHeader>
-//             <CardContent className="space-y-4">
-//               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-//                 <div className="space-y-2">
-//                   <Label>Pricing Type</Label>
-//                   <Select
-//                     value={watch('salePricingType') || 'FIXED'}
-//                     onValueChange={(v) =>
-//                       setValue('salePricingType', v as any)
-//                     }
-//                   >
-//                     <SelectTrigger className="h-11 rounded-lg">
-//                       <SelectValue />
-//                     </SelectTrigger>
-//                     <SelectContent>
-//                       {PRICING_OPTIONS.map((o) => (
-//                         <SelectItem key={o.value} value={o.value}>
-//                           {o.label}
-//                         </SelectItem>
-//                       ))}
-//                     </SelectContent>
-//                   </Select>
-//                 </div>
-
-//                 <div className="space-y-2">
-//                   <Label>Sale Price (₦)</Label>
-//                   <Input
-//                     type="number"
-//                     min={0}
-//                     className="h-11 rounded-lg"
-//                     placeholder="0.00"
-//                     {...register('salePrice', { valueAsNumber: true })}
-//                   />
-//                 </div>
-//               </div>
-//             </CardContent>
-//           </Card>
-//         )}
-
-//         {/* ── Lease Pricing ── */}
-//         {showLease && (
-//           <Card className="card-premium">
-//             <CardHeader>
-//               <CardTitle>Lease Pricing</CardTitle>
-//             </CardHeader>
-//             <CardContent className="space-y-4">
-//               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-//                 <div className="space-y-2">
-//                   <Label>Pricing Type</Label>
-//                   <Select
-//                     value={watch('leasePricingType') || 'FIXED'}
-//                     onValueChange={(v) =>
-//                       setValue('leasePricingType', v as any)
-//                     }
-//                   >
-//                     <SelectTrigger className="h-11 rounded-lg">
-//                       <SelectValue />
-//                     </SelectTrigger>
-//                     <SelectContent>
-//                       {PRICING_OPTIONS.map((o) => (
-//                         <SelectItem key={o.value} value={o.value}>
-//                           {o.label}
-//                         </SelectItem>
-//                       ))}
-//                     </SelectContent>
-//                   </Select>
-//                 </div>
-
-//                 <div className="space-y-2">
-//                   <Label>Lease Rate (₦)</Label>
-//                   <Input
-//                     type="number"
-//                     min={0}
-//                     className="h-11 rounded-lg"
-//                     placeholder="0.00"
-//                     {...register('leaseRate', { valueAsNumber: true })}
-//                   />
-//                 </div>
-
-//                 <div className="space-y-2">
-//                   <Label>Rate Period</Label>
-//                   <Select
-//                     value={watch('leaseRatePeriod') || 'DAILY'}
-//                     onValueChange={(v) =>
-//                       setValue('leaseRatePeriod', v as any)
-//                     }
-//                   >
-//                     <SelectTrigger className="h-11 rounded-lg">
-//                       <SelectValue />
-//                     </SelectTrigger>
-//                     <SelectContent>
-//                       {LEASE_PERIOD_OPTIONS.map((o) => (
-//                         <SelectItem key={o.value} value={o.value}>
-//                           {o.label}
-//                         </SelectItem>
-//                       ))}
-//                     </SelectContent>
-//                   </Select>
-//                 </div>
-//               </div>
-
-//               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-//                 <div className="space-y-2">
-//                   <Label>Deposit Requirement</Label>
-//                   <Select
-//                     value={watch('depositRequired') || 'NOT_REQUIRED'}
-//                     onValueChange={(v) =>
-//                       setValue('depositRequired', v as any)
-//                     }
-//                   >
-//                     <SelectTrigger className="h-11 rounded-lg">
-//                       <SelectValue />
-//                     </SelectTrigger>
-//                     <SelectContent>
-//                       {DEPOSIT_OPTIONS.map((o) => (
-//                         <SelectItem key={o.value} value={o.value}>
-//                           {o.label}
-//                         </SelectItem>
-//                       ))}
-//                     </SelectContent>
-//                   </Select>
-//                 </div>
-
-//                 {depositRequired === 'REQUIRED' && (
-//                   <div className="space-y-2">
-//                     <Label>Deposit Amount (₦)</Label>
-//                     <Input
-//                       type="number"
-//                       min={0}
-//                       className="h-11 rounded-lg"
-//                       placeholder="0.00"
-//                       {...register('depositAmount', {
-//                         valueAsNumber: true,
-//                       })}
-//                     />
-//                   </div>
-//                 )}
-//               </div>
-//             </CardContent>
-//           </Card>
-//         )}
-
-//         {/* ── Location & Delivery ── */}
-//         <Card className="card-premium">
-//           <CardHeader>
-//             <CardTitle>Location & Delivery</CardTitle>
-//           </CardHeader>
-//           <CardContent className="space-y-4">
-//             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-//               <div className="space-y-2">
-//                 <Label>Pickup Location</Label>
-//                 <Input
-//                   className="h-11 rounded-lg"
-//                   placeholder="Address or landmark"
-//                   {...register('pickupLocation')}
-//                 />
-//               </div>
-//               <div className="space-y-2">
-//                 <Label>State</Label>
-//                 <Input
-//                   className="h-11 rounded-lg"
-//                   placeholder="e.g. Lagos"
-//                   {...register('pickupLocationState')}
-//                 />
-//               </div>
-//             </div>
-
-//             <div className="flex items-center gap-3">
-//               <Switch
-//                 checked={watch('deliveryAvailable') || false}
-//                 onCheckedChange={(v) =>
-//                   setValue('deliveryAvailable', v)
-//                 }
-//               />
-//               <Label>Delivery Available</Label>
-//             </div>
-//           </CardContent>
-//         </Card>
-
-//         {/* ── Images ── */}
-//         <Card className="card-premium">
-//           <CardHeader>
-//             <CardTitle>Images</CardTitle>
-//           </CardHeader>
-//           <CardContent>
-//             <MultiImageUpload
-//               images={images}
-//               onImagesChange={setImages}
-//               folder="tools"
-//               maxImages={5}
-//             />
-//           </CardContent>
-//         </Card>
-
-//         <Button
-//           type="submit"
-//           className="btn-premium rounded-xl gap-2"
-//           disabled={isPending}
-//         >
-//           {isPending ? (
-//             <Loader2 className="h-4 w-4 animate-spin" />
-//           ) : (
-//             <Save className="h-4 w-4" />
-//           )}
-//           List Tool
-//         </Button>
-//       </form>
-//     </div>
-//   );
-// }
-
-// src/app/(dashboard)/my-tools/new/page.tsx
 'use client';
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { useCreateTool } from '@/hooks/use-tools';
 import { toolSchema, ToolFormData } from '@/lib/validations';
 import { BackButton } from '@/components/shared/back-button';
 import { PageHeader } from '@/components/shared/page-header';
 import { CategorySelect } from '@/components/shared/category-select';
 import { MultiImageUpload } from '@/components/shared/multi-image-upload';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -513,42 +44,49 @@ import {
   ShieldCheck,
   Package,
   X,
+  AlertCircle,
 } from 'lucide-react';
 
 const NIGERIA_STATES = [
-  'Abia','Adamawa','Akwa Ibom','Anambra','Bauchi','Bayelsa','Benue',
-  'Borno','Cross River','Delta','Ebonyi','Edo','Ekiti','Enugu','FCT',
-  'Gombe','Imo','Jigawa','Kaduna','Kano','Katsina','Kebbi','Kogi',
-  'Kwara','Lagos','Nasarawa','Niger','Ogun','Ondo','Osun','Oyo',
-  'Plateau','Rivers','Sokoto','Taraba','Yobe','Zamfara',
+  'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue',
+  'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT',
+  'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi',
+  'Kwara', 'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo',
+  'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara',
 ];
 
+// ── Must match Prisma ToolCondition enum ──
 const CONDITION_OPTIONS = [
   { value: 'NEW', label: 'Brand New', desc: 'Unused, in original packaging' },
-  { value: 'FAIRLY_USED', label: 'Fairly Used', desc: 'Good working condition' },
-  { value: 'USED', label: 'Used', desc: 'Functional with wear' },
-  { value: 'REFURBISHED', label: 'Refurbished', desc: 'Restored to working condition' },
+  { value: 'LIKE_NEW', label: 'Like New', desc: 'Used but in excellent condition' },
+  { value: 'GOOD', label: 'Good', desc: 'Normal wear, fully functional' },
+  { value: 'FAIR', label: 'Fair', desc: 'Visible wear but functional' },
+  { value: 'FOR_PARTS', label: 'For Parts', desc: 'Not fully functional' },
 ];
 
+// ── Must match Prisma ToolListingPurpose enum ──
 const PURPOSE_OPTIONS = [
-  { value: 'SALE', label: 'For Sale', icon: '💰' },
-  { value: 'LEASE', label: 'For Lease / Rent', icon: '🔄' },
+  { value: 'FOR_SALE', label: 'For Sale', icon: '💰' },
+  { value: 'FOR_LEASE', label: 'For Lease / Rent', icon: '🔄' },
   { value: 'BOTH', label: 'Sale & Lease', icon: '✨' },
 ];
 
+// ── Must match Prisma PricingType enum ──
 const PRICING_OPTIONS = [
   { value: 'FIXED', label: 'Fixed Price' },
   { value: 'NEGOTIABLE', label: 'Negotiable' },
+  { value: 'BOTH', label: 'Fixed but Negotiable' },
 ];
 
+// ── Must match Prisma LeaseRatePeriod enum ──
 const LEASE_PERIOD_OPTIONS = [
-  { value: 'HOURLY', label: 'Per Hour' },
-  { value: 'DAILY', label: 'Per Day' },
-  { value: 'WEEKLY', label: 'Per Week' },
-  { value: 'MONTHLY', label: 'Per Month' },
-  { value: 'SEASONAL', label: 'Per Season' },
+  { value: 'PER_HOUR', label: 'Per Hour' },
+  { value: 'PER_DAY', label: 'Per Day' },
+  { value: 'PER_WEEK', label: 'Per Week' },
+  { value: 'PER_MONTH', label: 'Per Month' },
 ];
 
+// ── Must match Prisma DepositRequirement enum ──
 const DEPOSIT_OPTIONS = [
   { value: 'REQUIRED', label: 'Required' },
   { value: 'NOT_REQUIRED', label: 'Not Required' },
@@ -567,14 +105,17 @@ export default function NewToolPage() {
     handleSubmit,
     setValue,
     watch,
+    trigger,
     formState: { errors },
   } = useForm<ToolFormData>({
-    resolver: zodResolver(toolSchema),
+    resolver: zodResolver(toolSchema) as any,
+    mode: 'onChange',
     defaultValues: {
       condition: 'NEW',
-      listingPurpose: 'SALE',
+      listingPurpose: 'FOR_SALE',
       salePricingType: 'FIXED',
       leasePricingType: 'FIXED',
+      leaseRatePeriod: 'PER_DAY',
       depositRequired: 'NOT_REQUIRED',
       deliveryAvailable: false,
       quantityAvailable: 1,
@@ -584,8 +125,10 @@ export default function NewToolPage() {
 
   const listingPurpose = watch('listingPurpose');
   const depositRequired = watch('depositRequired');
-  const showSale = listingPurpose === 'SALE' || listingPurpose === 'BOTH';
-  const showLease = listingPurpose === 'LEASE' || listingPurpose === 'BOTH';
+  const salePricingType = watch('salePricingType');
+  const leasePricingType = watch('leasePricingType');
+  const showSale = listingPurpose === 'FOR_SALE' || listingPurpose === 'BOTH';
+  const showLease = listingPurpose === 'FOR_LEASE' || listingPurpose === 'BOTH';
 
   const addTag = () => {
     const trimmed = tagInput.trim().toLowerCase();
@@ -604,42 +147,114 @@ export default function NewToolPage() {
   };
 
   const onSubmit = (data: ToolFormData) => {
-    const payload: any = { ...data, tags };
+    const isSale =
+      data.listingPurpose === 'FOR_SALE' || data.listingPurpose === 'BOTH';
+    const isLease =
+      data.listingPurpose === 'FOR_LEASE' || data.listingPurpose === 'BOTH';
 
-    if (!showSale) {
-      delete payload.salePricingType;
-      delete payload.salePrice;
-    }
-    if (!showLease) {
-      delete payload.leasePricingType;
-      delete payload.leaseRate;
-      delete payload.leaseRatePeriod;
-      delete payload.depositRequired;
-      delete payload.depositAmount;
-    }
-    if (depositRequired !== 'REQUIRED') {
-      delete payload.depositAmount;
+    // Manual conditional validation
+    if (isSale && data.salePricingType === 'FIXED') {
+      if (!data.salePrice || data.salePrice <= 0) {
+        toast.error('Sale price is required for fixed pricing');
+        return;
+      }
     }
 
-    // Clean empty strings
-    if (!payload.shortDescription) delete payload.shortDescription;
-    if (!payload.brandName) delete payload.brandName;
-    if (!payload.modelNumber) delete payload.modelNumber;
-    if (!payload.pickupLocation) delete payload.pickupLocation;
-    if (!payload.pickupLocationState) delete payload.pickupLocationState;
+    if (isLease && data.leasePricingType === 'FIXED') {
+      if (!data.leaseRate || data.leaseRate <= 0) {
+        toast.error('Lease rate is required for fixed pricing');
+        return;
+      }
+    }
 
+    if (
+      isLease &&
+      data.depositRequired === 'REQUIRED' &&
+      (!data.depositAmount || data.depositAmount <= 0)
+    ) {
+      toast.error('Deposit amount is required when deposit is required');
+      return;
+    }
+
+    // Build clean payload — NO images property
+    const payload: Record<string, any> = {
+      name: data.name,
+      description: data.description,
+      categoryId: data.categoryId,
+      condition: data.condition,
+      listingPurpose: data.listingPurpose,
+      quantityAvailable: data.quantityAvailable || 1,
+      tags,
+      deliveryAvailable: data.deliveryAvailable || false,
+    };
+
+    // Optional strings — only include if non-empty
+    if (data.shortDescription) payload.shortDescription = data.shortDescription;
+    if (data.brandName) payload.brandName = data.brandName;
+    if (data.modelNumber) payload.modelNumber = data.modelNumber;
+    if (data.pickupLocation) payload.pickupLocation = data.pickupLocation;
+    if (data.pickupLocationState)
+      payload.pickupLocationState = data.pickupLocationState;
+    if (data.pickupLocationLga)
+      payload.pickupLocationLga = data.pickupLocationLga;
+
+    // Sale pricing — only when selling
+    if (isSale) {
+      payload.salePricingType = data.salePricingType || 'FIXED';
+      if (data.salePrice && data.salePrice > 0) {
+        payload.salePrice = data.salePrice;
+      }
+    }
+
+    // Lease pricing — only when leasing
+    if (isLease) {
+      payload.leasePricingType = data.leasePricingType || 'FIXED';
+      payload.leaseRatePeriod = data.leaseRatePeriod || 'PER_DAY';
+      if (data.leaseRate && data.leaseRate > 0) {
+        payload.leaseRate = data.leaseRate;
+      }
+      payload.depositRequired = data.depositRequired || 'NOT_REQUIRED';
+      if (
+        data.depositRequired === 'REQUIRED' &&
+        data.depositAmount &&
+        data.depositAmount > 0
+      ) {
+        payload.depositAmount = data.depositAmount;
+      }
+    }
+
+    // Delivery
+    if (data.deliveryAvailable) {
+      if (data.deliveryFee && data.deliveryFee > 0) {
+        payload.deliveryFee = data.deliveryFee;
+      }
+      if (data.deliveryNotes) {
+        payload.deliveryNotes = data.deliveryNotes;
+      }
+    }
+
+    // Images passed separately — the hook handles the 2-step flow:
+    // 1. Create tool (payload without images)
+    // 2. POST /tools/:id/images for each image
     createTool(
       {
         ...payload,
         images: images.map((img, idx) => ({
           imageUrl: img.imageUrl || img.url,
-          thumbnailUrl: img.thumbnailUrl || img.url,
+          thumbnailUrl: img.thumbnailUrl || img.url || img.imageUrl,
+          mediumUrl: img.mediumUrl || img.url || img.imageUrl,
           isPrimary: idx === 0,
         })),
       },
       { onSuccess: () => router.push('/my-tools') },
     );
   };
+
+  const onError = (formErrors: any) => {
+    console.error('Form validation errors:', formErrors);
+  };
+
+  const errorCount = Object.keys(errors).length;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -654,9 +269,38 @@ export default function NewToolPage() {
         <span>Fields marked with * are required.</span>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Error Summary */}
+      {errorCount > 0 && (
+        <div className="flex items-start gap-3 p-4 rounded-xl bg-destructive/5 border border-destructive/20 text-destructive">
+          <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="text-sm font-semibold">
+              Please fix {errorCount}{' '}
+              {errorCount === 1 ? 'error' : 'errors'} before submitting
+            </p>
+            <ul className="text-xs space-y-0.5 list-disc list-inside text-destructive/80">
+              {Object.entries(errors).map(([key, error]) => (
+                <li key={key}>
+                  <span className="font-medium capitalize">
+                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                  </span>
+                  : {(error as any)?.message || 'Invalid value'}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      <form
+        onSubmit={handleSubmit(
+          onSubmit as (data: Record<string, any>) => void,
+          onError,
+        )}
+        className="space-y-6"
+      >
         {/* ══════════════════════════════════════ */}
-        {/* SECTION 1: Tool Information             */}
+        {/* SECTION 1: Tool Information            */}
         {/* ══════════════════════════════════════ */}
         <Card className="card-premium">
           <CardHeader>
@@ -666,7 +310,9 @@ export default function NewToolPage() {
               </div>
               <div>
                 <CardTitle>Tool Information</CardTitle>
-                <CardDescription>Basic details about your tool</CardDescription>
+                <CardDescription>
+                  Basic details about your tool
+                </CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -680,7 +326,9 @@ export default function NewToolPage() {
                 {...register('name')}
               />
               {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
@@ -692,9 +340,13 @@ export default function NewToolPage() {
                 placeholder="Describe the tool in detail — features, capabilities, condition details, included accessories..."
                 {...register('description')}
               />
-              <p className="text-xs text-muted-foreground">Min 20 characters</p>
+              <p className="text-xs text-muted-foreground">
+                Min 20 characters
+              </p>
               {errors.description && (
-                <p className="text-sm text-destructive">{errors.description.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.description.message}
+                </p>
               )}
             </div>
 
@@ -709,17 +361,20 @@ export default function NewToolPage() {
 
             <Separator />
 
-            {/* Category — uses composite type "TOOL" */}
             <CategorySelect
-              type="TOOL"
+              type="TOOL_FARMING"
               value={watch('categoryId') || ''}
-              onChange={(v) => setValue('categoryId', v, { shouldValidate: true })}
-              label="Category"
+              onChange={(v) =>
+                setValue('categoryId', v, { shouldValidate: true })
+              }
+              label="Category *"
               placeholder="Select tool category"
               required
             />
             {errors.categoryId && (
-              <p className="text-sm text-destructive">{errors.categoryId.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.categoryId.message}
+              </p>
             )}
 
             <Separator />
@@ -730,7 +385,9 @@ export default function NewToolPage() {
                 <Select
                   value={watch('condition')}
                   onValueChange={(v) =>
-                    setValue('condition', v as any, { shouldValidate: true })
+                    setValue('condition', v as any, {
+                      shouldValidate: true,
+                    })
                   }
                 >
                   <SelectTrigger className="h-11 rounded-lg">
@@ -739,13 +396,20 @@ export default function NewToolPage() {
                   <SelectContent>
                     {CONDITION_OPTIONS.map((o) => (
                       <SelectItem key={o.value} value={o.value}>
-                        {o.label}
+                        <div>
+                          <span>{o.label}</span>
+                          <span className="text-xs text-muted-foreground ml-2">
+                            — {o.desc}
+                          </span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 {errors.condition && (
-                  <p className="text-sm text-destructive">{errors.condition.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.condition.message}
+                  </p>
                 )}
               </div>
 
@@ -753,9 +417,18 @@ export default function NewToolPage() {
                 <Label>Listing Purpose *</Label>
                 <Select
                   value={listingPurpose}
-                  onValueChange={(v) =>
-                    setValue('listingPurpose', v as any, { shouldValidate: true })
-                  }
+                  onValueChange={(v) => {
+                    setValue('listingPurpose', v as any, {
+                      shouldValidate: true,
+                    });
+                    setTimeout(() => {
+                      trigger([
+                        'salePrice',
+                        'leaseRate',
+                        'depositAmount',
+                      ]);
+                    }, 100);
+                  }}
                 >
                   <SelectTrigger className="h-11 rounded-lg">
                     <SelectValue placeholder="Select purpose" />
@@ -769,7 +442,9 @@ export default function NewToolPage() {
                   </SelectContent>
                 </Select>
                 {errors.listingPurpose && (
-                  <p className="text-sm text-destructive">{errors.listingPurpose.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.listingPurpose.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -797,7 +472,9 @@ export default function NewToolPage() {
                   type="number"
                   min={1}
                   className="h-11 rounded-lg"
-                  {...register('quantityAvailable', { valueAsNumber: true })}
+                  {...register('quantityAvailable', {
+                    valueAsNumber: true,
+                  })}
                 />
               </div>
             </div>
@@ -810,9 +487,16 @@ export default function NewToolPage() {
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {tags.map((tag, i) => (
-                    <Badge key={tag} variant="secondary" className="gap-1 px-2.5 py-1">
+                    <Badge
+                      key={tag}
+                      variant="secondary"
+                      className="gap-1 px-2.5 py-1"
+                    >
                       {tag}
-                      <button type="button" onClick={() => removeTag(i)}>
+                      <button
+                        type="button"
+                        onClick={() => removeTag(i)}
+                      >
                         <X className="h-3 w-3" />
                       </button>
                     </Badge>
@@ -834,13 +518,15 @@ export default function NewToolPage() {
                   placeholder="Type tag and press Enter"
                 />
               )}
-              <p className="text-xs text-muted-foreground">{tags.length}/10 tags</p>
+              <p className="text-xs text-muted-foreground">
+                {tags.length}/10 tags
+              </p>
             </div>
           </CardContent>
         </Card>
 
         {/* ══════════════════════════════════════ */}
-        {/* SECTION 2: Sale Pricing                 */}
+        {/* SECTION 2: Sale Pricing                */}
         {/* ══════════════════════════════════════ */}
         {showSale && (
           <Card className="card-premium border-l-4 border-l-green-500">
@@ -851,7 +537,9 @@ export default function NewToolPage() {
                 </div>
                 <div>
                   <CardTitle>Sale Pricing</CardTitle>
-                  <CardDescription>Set your selling price</CardDescription>
+                  <CardDescription>
+                    Set your selling price
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -861,7 +549,10 @@ export default function NewToolPage() {
                   <Label>Pricing Type</Label>
                   <Select
                     value={watch('salePricingType') || 'FIXED'}
-                    onValueChange={(v) => setValue('salePricingType', v as any)}
+                    onValueChange={(v) => {
+                      setValue('salePricingType', v as any);
+                      trigger('salePrice');
+                    }}
                   >
                     <SelectTrigger className="h-11 rounded-lg">
                       <SelectValue />
@@ -876,17 +567,24 @@ export default function NewToolPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Sale Price (₦) *</Label>
+                  <Label>
+                    Sale Price (₦)
+                    {salePricingType === 'FIXED' && ' *'}
+                  </Label>
                   <Input
                     type="number"
                     min={0}
                     step="0.01"
                     className="h-11 rounded-lg"
                     placeholder="0.00"
-                    {...register('salePrice', { valueAsNumber: true })}
+                    {...register('salePrice', {
+                      valueAsNumber: true,
+                    })}
                   />
                   {errors.salePrice && (
-                    <p className="text-sm text-destructive">{errors.salePrice.message}</p>
+                    <p className="text-sm text-destructive">
+                      {errors.salePrice.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -895,7 +593,7 @@ export default function NewToolPage() {
         )}
 
         {/* ══════════════════════════════════════ */}
-        {/* SECTION 3: Lease Pricing                */}
+        {/* SECTION 3: Lease Pricing               */}
         {/* ══════════════════════════════════════ */}
         {showLease && (
           <Card className="card-premium border-l-4 border-l-blue-500">
@@ -906,7 +604,9 @@ export default function NewToolPage() {
                 </div>
                 <div>
                   <CardTitle>Lease / Rental Pricing</CardTitle>
-                  <CardDescription>Set your lease rate and terms</CardDescription>
+                  <CardDescription>
+                    Set your lease rate and terms
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -916,7 +616,10 @@ export default function NewToolPage() {
                   <Label>Pricing Type</Label>
                   <Select
                     value={watch('leasePricingType') || 'FIXED'}
-                    onValueChange={(v) => setValue('leasePricingType', v as any)}
+                    onValueChange={(v) => {
+                      setValue('leasePricingType', v as any);
+                      trigger('leaseRate');
+                    }}
                   >
                     <SelectTrigger className="h-11 rounded-lg">
                       <SelectValue />
@@ -931,24 +634,33 @@ export default function NewToolPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Lease Rate (₦) *</Label>
+                  <Label>
+                    Lease Rate (₦)
+                    {leasePricingType === 'FIXED' && ' *'}
+                  </Label>
                   <Input
                     type="number"
                     min={0}
                     step="0.01"
                     className="h-11 rounded-lg"
                     placeholder="0.00"
-                    {...register('leaseRate', { valueAsNumber: true })}
+                    {...register('leaseRate', {
+                      valueAsNumber: true,
+                    })}
                   />
                   {errors.leaseRate && (
-                    <p className="text-sm text-destructive">{errors.leaseRate.message}</p>
+                    <p className="text-sm text-destructive">
+                      {errors.leaseRate.message}
+                    </p>
                   )}
                 </div>
                 <div className="space-y-2">
                   <Label>Rate Period</Label>
                   <Select
-                    value={watch('leaseRatePeriod') || 'DAILY'}
-                    onValueChange={(v) => setValue('leaseRatePeriod', v as any)}
+                    value={watch('leaseRatePeriod') || 'PER_DAY'}
+                    onValueChange={(v) =>
+                      setValue('leaseRatePeriod', v as any)
+                    }
                   >
                     <SelectTrigger className="h-11 rounded-lg">
                       <SelectValue />
@@ -972,8 +684,13 @@ export default function NewToolPage() {
                     <ShieldCheck className="h-3.5 w-3.5" /> Deposit
                   </Label>
                   <Select
-                    value={watch('depositRequired') || 'NOT_REQUIRED'}
-                    onValueChange={(v) => setValue('depositRequired', v as any)}
+                    value={
+                      watch('depositRequired') || 'NOT_REQUIRED'
+                    }
+                    onValueChange={(v) => {
+                      setValue('depositRequired', v as any);
+                      trigger('depositAmount');
+                    }}
                   >
                     <SelectTrigger className="h-11 rounded-lg">
                       <SelectValue />
@@ -996,10 +713,14 @@ export default function NewToolPage() {
                       step="0.01"
                       className="h-11 rounded-lg"
                       placeholder="0.00"
-                      {...register('depositAmount', { valueAsNumber: true })}
+                      {...register('depositAmount', {
+                        valueAsNumber: true,
+                      })}
                     />
                     {errors.depositAmount && (
-                      <p className="text-sm text-destructive">{errors.depositAmount.message}</p>
+                      <p className="text-sm text-destructive">
+                        {errors.depositAmount.message}
+                      </p>
                     )}
                   </div>
                 )}
@@ -1009,7 +730,7 @@ export default function NewToolPage() {
         )}
 
         {/* ══════════════════════════════════════ */}
-        {/* SECTION 4: Location & Delivery          */}
+        {/* SECTION 4: Location & Delivery         */}
         {/* ══════════════════════════════════════ */}
         <Card className="card-premium">
           <CardHeader>
@@ -1019,7 +740,9 @@ export default function NewToolPage() {
               </div>
               <div>
                 <CardTitle>Location & Delivery</CardTitle>
-                <CardDescription>Where can this tool be picked up?</CardDescription>
+                <CardDescription>
+                  Where can this tool be picked up?
+                </CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -1037,7 +760,9 @@ export default function NewToolPage() {
                 <Label>State</Label>
                 <Select
                   value={watch('pickupLocationState') || ''}
-                  onValueChange={(v) => setValue('pickupLocationState', v)}
+                  onValueChange={(v) =>
+                    setValue('pickupLocationState', v)
+                  }
                 >
                   <SelectTrigger className="h-11 rounded-lg">
                     <SelectValue placeholder="Select state" />
@@ -1057,21 +782,51 @@ export default function NewToolPage() {
 
             <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
               <div>
-                <Label className="font-medium">Delivery Available</Label>
+                <Label className="font-medium">
+                  Delivery Available
+                </Label>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   Can you deliver this tool to the buyer/renter?
                 </p>
               </div>
               <Switch
                 checked={watch('deliveryAvailable') || false}
-                onCheckedChange={(v) => setValue('deliveryAvailable', v)}
+                onCheckedChange={(v) =>
+                  setValue('deliveryAvailable', v)
+                }
               />
             </div>
+
+            {watch('deliveryAvailable') && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-4 border-l-2 border-primary/20">
+                <div className="space-y-2">
+                  <Label>Delivery Fee (₦)</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    className="h-11 rounded-lg"
+                    placeholder="0.00 (leave empty if free)"
+                    {...register('deliveryFee', {
+                      valueAsNumber: true,
+                    })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Delivery Notes</Label>
+                  <Input
+                    className="h-11 rounded-lg"
+                    placeholder="e.g. Within Kaduna only"
+                    {...register('deliveryNotes')}
+                  />
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* ══════════════════════════════════════ */}
-        {/* SECTION 5: Images                       */}
+        {/* SECTION 5: Images                      */}
         {/* ══════════════════════════════════════ */}
         <Card className="card-premium">
           <CardHeader>
@@ -1097,7 +852,9 @@ export default function NewToolPage() {
           </CardContent>
         </Card>
 
-        {/* Submit */}
+        {/* ══════════════════════════════════════ */}
+        {/* SUBMIT                                 */}
+        {/* ══════════════════════════════════════ */}
         <div className="flex items-center gap-4 pt-2">
           <Button
             type="submit"
