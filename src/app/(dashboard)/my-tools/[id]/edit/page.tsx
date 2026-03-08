@@ -962,7 +962,7 @@ export default function EditToolPage() {
     reset,
     formState: { errors, isDirty },
   } = useForm<ToolFormData>({
-    resolver: zodResolver(toolSchema),
+    resolver: zodResolver(toolSchema) as any,
   });
 
   useEffect(() => {
@@ -1008,8 +1008,8 @@ export default function EditToolPage() {
 
   const listingPurpose = watch('listingPurpose');
   const depositRequired = watch('depositRequired');
-  const showSale = listingPurpose === 'SALE' || listingPurpose === 'BOTH';
-  const showLease = listingPurpose === 'LEASE' || listingPurpose === 'BOTH';
+  const showSale = listingPurpose === 'FOR_SALE' || listingPurpose === 'BOTH';
+  const showLease = listingPurpose === 'FOR_LEASE' || listingPurpose === 'BOTH';
 
   const addTag = () => {
     const trimmed = tagInput.trim().toLowerCase();
