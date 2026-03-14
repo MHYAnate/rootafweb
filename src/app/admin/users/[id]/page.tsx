@@ -1,81 +1,4 @@
-// 'use client';
 
-// import { useParams } from 'next/navigation';
-// import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-// import { toast } from 'sonner';
-// import { adminApi } from '@/lib/api/admin.api';
-// import { BackButton } from '@/components/shared/back-button';
-// import { PageHeader } from '@/components/shared/page-header';
-// import { LoadingSpinner } from '@/components/shared/loading-spinner';
-// import { StatusBadge } from '@/components/shared/status-badge';
-// import { PremiumAvatar } from '@/components/shared/premium-avatar';
-// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Button } from '@/components/ui/button';
-// import { formatDate, formatPhoneNumber } from '@/lib/format';
-// import { Ban, RefreshCw, Loader2 } from 'lucide-react';
-
-// export default function AdminUserDetailPage() {
-//   const { id } = useParams();
-//   const qc = useQueryClient();
-//   const { data, isLoading } = useQuery({
-//     queryKey: ['admin-user', id],
-//     queryFn: () => adminApi.getUserById(id as string),
-//     enabled: !!id,
-//   });
-
-//   const suspendMutation = useMutation({
-//     mutationFn: () => adminApi.suspendUser(id as string, 'Admin action'),
-//     onSuccess: () => { toast.success('User suspended'); qc.invalidateQueries({ queryKey: ['admin-user', id] }); },
-//   });
-
-//   const reactivateMutation = useMutation({
-//     mutationFn: () => adminApi.reactivateUser(id as string),
-//     onSuccess: () => { toast.success('User reactivated'); qc.invalidateQueries({ queryKey: ['admin-user', id] }); },
-//   });
-
-//   if (isLoading) return <LoadingSpinner size="lg" className="py-20" />;
-//   const user = data?.data;
-//   if (!user) return <div>User not found</div>;
-
-//   return (
-//     <div className="space-y-6">
-//       <BackButton href="/admin/users" />
-//       <PageHeader title={user.fullName} />
-
-//       <Card className="card-gold">
-//         <CardContent className="p-6">
-//           <div className="flex items-start gap-4">
-//             <PremiumAvatar name={user.fullName} size="xl" verified={user.verificationStatus === 'VERIFIED'} />
-//             <div className="space-y-2 text-sm">
-//               <p><strong>Phone:</strong> {formatPhoneNumber(user.phoneNumber)}</p>
-//               <p><strong>Email:</strong> {user.email || 'N/A'}</p>
-//               <p><strong>Type:</strong> {user.userType}</p>
-//               <p><strong>Status:</strong> <StatusBadge status={user.verificationStatus} /></p>
-//               <p><strong>Joined:</strong> {formatDate(user.createdAt)}</p>
-//               <p><strong>Last Login:</strong> {formatDate(user.lastLoginAt)}</p>
-//               <p><strong>Active:</strong> {user.isActive ? 'Yes' : 'No'}</p>
-//             </div>
-//           </div>
-//         </CardContent>
-//       </Card>
-
-//       <Card className="card-premium">
-//         <CardHeader><CardTitle>Actions</CardTitle></CardHeader>
-//         <CardContent className="flex gap-3">
-//           {user.isActive ? (
-//             <Button variant="destructive" className="rounded-xl gap-2" onClick={() => suspendMutation.mutate()} disabled={suspendMutation.isPending}>
-//               {suspendMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ban className="h-4 w-4" />}Suspend User
-//             </Button>
-//           ) : (
-//             <Button className="btn-premium rounded-xl gap-2" onClick={() => reactivateMutation.mutate()} disabled={reactivateMutation.isPending}>
-//               {reactivateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}Reactivate User
-//             </Button>
-//           )}
-//         </CardContent>
-//       </Card>
-//     </div>
-//   );
-// }
 'use client';
 
 import { useParams } from 'next/navigation';
@@ -94,12 +17,11 @@ import { PremiumAvatar } from '@/components/shared/premium-avatar';
 import { RatingStars } from '@/components/shared/rating-stars';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { formatDate, formatPhoneNumber, formatCurrency, formatNumber } from '@/lib/format';
-import { PROVIDER_TYPE_MAP } from '@/lib/constants';
+import { formatDate, formatPhoneNumber, formatNumber } from '@/lib/format';
+import { getProviderTypeLabel, getProviderTypeDisplay } from '@/lib/constants';
 import {
-  User, MapPin, Phone, Mail, Calendar, Shield, Star,
+  MapPin, Phone, Mail, Calendar, Star,
   Package, Wrench, Hammer, Award, Eye, DollarSign,
   Ban, RotateCcw, KeyRound, Loader2,
 } from 'lucide-react';
@@ -122,7 +44,6 @@ export default function AdminUserDetailPage() {
   if (!user) return <div className="text-center py-20">User not found</div>;
 
   const mp = user.memberProfile;
-  const cp = user.clientProfile;
 
   return (
     <div className="space-y-6">
@@ -130,7 +51,7 @@ export default function AdminUserDetailPage() {
 
       {/* Header Card */}
       <Card className="rounded-2xl border-border/50 overflow-hidden">
-        <div className="h-1.5 bg-gradient-to-r from-primary via-gold-400 to-royal-400" />
+        <div className="h-1.5 bg-gradient-to-r from-primary via-amber-400 to-blue-400" />
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-6">
             <PremiumAvatar
@@ -144,17 +65,39 @@ export default function AdminUserDetailPage() {
                 <StatusBadge status={user.verificationStatus} />
               </div>
               <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1.5"><Phone className="h-4 w-4 text-primary" />{formatPhoneNumber(user.phoneNumber)}</span>
-                {user.email && <span className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-primary" />{user.email}</span>}
-                <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4 text-primary" />Joined {formatDate(user.createdAt)}</span>
-                {mp?.state && <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-primary" />{mp.localGovernmentArea}, {mp.state}</span>}
+                <span className="flex items-center gap-1.5">
+                  <Phone className="h-4 w-4 text-primary" />
+                  {formatPhoneNumber(user.phoneNumber)}
+                </span>
+                {user.email && (
+                  <span className="flex items-center gap-1.5">
+                    <Mail className="h-4 w-4 text-primary" />
+                    {user.email}
+                  </span>
+                )}
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  Joined {formatDate(user.createdAt)}
+                </span>
+                {mp?.state && (
+                  <span className="flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    {mp.localGovernmentArea}, {mp.state}
+                  </span>
+                )}
               </div>
               {mp && (
                 <div className="flex items-center gap-3 mt-3">
-                  <span className="text-xs font-bold uppercase tracking-wider text-gold-600 bg-gold-50 px-3 py-1 rounded-full border border-gold-200">
-                    {PROVIDER_TYPE_MAP[mp.providerType] as any}
+                  {/* FIX: Use helper function instead of rendering object directly */}
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                    {getProviderTypeDisplay(mp.providerType)}
                   </span>
-                  <RatingStars rating={Number(mp.averageRating)} size="sm" showValue totalRatings={mp.totalRatings} />
+                  <RatingStars
+                    rating={Number(mp.averageRating)}
+                    size="sm"
+                    showValue
+                    totalRatings={mp.totalRatings}
+                  />
                   {mp.isFeatured && (
                     <span className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
                       ⭐ Featured
@@ -185,7 +128,11 @@ export default function AdminUserDetailPage() {
                 onClick={() => resetPassword.mutate({ userId: user.id, newPassword: 'TempPass@2025' })}
                 disabled={resetPassword.isPending}
               >
-                {resetPassword.isPending ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <KeyRound className="h-4 w-4 mr-1.5" />}
+                {resetPassword.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                ) : (
+                  <KeyRound className="h-4 w-4 mr-1.5" />
+                )}
                 Reset Password
               </Button>
               {user.verificationStatus === 'SUSPENDED' ? (
@@ -245,12 +192,12 @@ export default function AdminUserDetailPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           {[
             { label: 'Products', value: mp.totalProducts, icon: Package, gradient: 'from-primary to-emerald-600' },
-            { label: 'Services', value: mp.totalServices, icon: Wrench, gradient: 'from-royal-500 to-royal-600' },
-            { label: 'Tools', value: mp.totalTools, icon: Hammer, gradient: 'from-gold-500 to-gold-600' },
+            { label: 'Services', value: mp.totalServices, icon: Wrench, gradient: 'from-blue-500 to-blue-600' },
+            { label: 'Tools', value: mp.totalTools, icon: Hammer, gradient: 'from-amber-500 to-amber-600' },
             { label: 'Certificates', value: mp.totalCertificates, icon: Award, gradient: 'from-violet-500 to-violet-600' },
-            { label: 'Rating', value: Number(mp.averageRating).toFixed(1), icon: Star, gradient: 'from-gold-400 to-gold-500' },
-            { label: 'Profile Views', value: formatNumber(mp.profileViewCount), icon: Eye, gradient: 'from-emerald-500 to-primary' },
-            { label: 'Transactions', value: mp.totalTransactions, icon: DollarSign, gradient: 'from-royal-400 to-royal-500' },
+            { label: 'Rating', value: Number(mp.averageRating).toFixed(1), icon: Star, gradient: 'from-amber-400 to-amber-500' },
+            { label: 'Views', value: formatNumber(mp.profileViewCount), icon: Eye, gradient: 'from-emerald-500 to-primary' },
+            { label: 'Transactions', value: mp.totalTransactions, icon: DollarSign, gradient: 'from-blue-400 to-blue-500' },
           ].map((stat) => (
             <Card key={stat.label} className="rounded-2xl border-border/50">
               <CardContent className="p-4 text-center">
@@ -265,7 +212,7 @@ export default function AdminUserDetailPage() {
         </div>
       )}
 
-      {/* User Details Tabs */}
+      {/* Tabs */}
       <Tabs defaultValue="info">
         <TabsList className="rounded-xl">
           <TabsTrigger value="info" className="rounded-lg">Profile Info</TabsTrigger>
@@ -276,20 +223,21 @@ export default function AdminUserDetailPage() {
         <TabsContent value="info" className="mt-4">
           <Card className="rounded-2xl border-border/50">
             <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div><span className="text-muted-foreground block text-xs mb-0.5">User ID</span><code className="text-xs bg-muted px-2 py-0.5 rounded">{user.id}</code></div>
-              <div><span className="text-muted-foreground block text-xs mb-0.5">Phone</span><strong>{formatPhoneNumber(user.phoneNumber)}</strong></div>
-              <div><span className="text-muted-foreground block text-xs mb-0.5">Email</span><strong>{user.email || 'N/A'}</strong></div>
-              <div><span className="text-muted-foreground block text-xs mb-0.5">Type</span><strong>{user.userType}</strong></div>
-              <div><span className="text-muted-foreground block text-xs mb-0.5">Account Active</span><strong>{user.isActive ? 'Yes' : 'No'}</strong></div>
-              <div><span className="text-muted-foreground block text-xs mb-0.5">Last Login</span><strong>{formatDate(user.lastLoginAt) || 'Never'}</strong></div>
-              <div><span className="text-muted-foreground block text-xs mb-0.5">Login Count</span><strong>{user.loginCount}</strong></div>
-              <div><span className="text-muted-foreground block text-xs mb-0.5">Last Login IP</span><strong>{user.lastLoginIp || 'N/A'}</strong></div>
+              <InfoItem label="User ID"><code className="text-xs bg-muted px-2 py-0.5 rounded">{user.id}</code></InfoItem>
+              <InfoItem label="Phone">{formatPhoneNumber(user.phoneNumber)}</InfoItem>
+              <InfoItem label="Email">{user.email || 'N/A'}</InfoItem>
+              <InfoItem label="Type">{user.userType}</InfoItem>
+              <InfoItem label="Account Active">{user.isActive ? 'Yes' : 'No'}</InfoItem>
+              <InfoItem label="Last Login">{formatDate(user.lastLoginAt) || 'Never'}</InfoItem>
+              <InfoItem label="Login Count">{String(user.loginCount || 0)}</InfoItem>
+              <InfoItem label="Last Login IP">{user.lastLoginIp || 'N/A'}</InfoItem>
               {mp && (
                 <>
-                  <div><span className="text-muted-foreground block text-xs mb-0.5">Address</span><strong>{mp.address}</strong></div>
-                  <div><span className="text-muted-foreground block text-xs mb-0.5">Bio</span><strong>{mp.bio || 'N/A'}</strong></div>
-                  <div><span className="text-muted-foreground block text-xs mb-0.5">Years of Experience</span><strong>{mp.yearsOfExperience || 'N/A'}</strong></div>
-                  <div><span className="text-muted-foreground block text-xs mb-0.5">Profile Completeness</span><strong>{mp.profileCompleteness}%</strong></div>
+                  <InfoItem label="Provider Type">{getProviderTypeLabel(mp.providerType)}</InfoItem>
+                  <InfoItem label="Address">{mp.address}</InfoItem>
+                  <InfoItem label="Bio">{mp.bio || 'N/A'}</InfoItem>
+                  <InfoItem label="Years of Experience">{String(mp.yearsOfExperience || 'N/A')}</InfoItem>
+                  <InfoItem label="Profile Completeness">{`${mp.profileCompleteness || 0}%`}</InfoItem>
                 </>
               )}
             </CardContent>
@@ -307,10 +255,14 @@ export default function AdminUserDetailPage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="font-semibold">{spec.category?.name}</p>
-                            <p className="text-xs text-muted-foreground">{spec.specializationType} • {spec.experienceYears || 0} years</p>
+                            <p className="text-xs text-muted-foreground">
+                              {spec.specializationType} • {spec.experienceYears || 0} years
+                            </p>
                           </div>
                           {spec.isPrimary && (
-                            <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Primary</span>
+                            <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                              Primary
+                            </span>
                           )}
                         </div>
                         {spec.specificSkills?.length > 0 && (
@@ -335,17 +287,27 @@ export default function AdminUserDetailPage() {
           <Card className="rounded-2xl border-border/50">
             <CardContent className="p-6 text-sm">
               <div className="grid grid-cols-2 gap-4">
-                <div><span className="text-muted-foreground block text-xs mb-0.5">Total Logins</span><strong className="text-2xl">{user.loginCount || 0}</strong></div>
-                <div><span className="text-muted-foreground block text-xs mb-0.5">Failed Attempts</span><strong className="text-2xl">{user.failedLoginAttempts || 0}</strong></div>
-                <div><span className="text-muted-foreground block text-xs mb-0.5">Last Login</span><strong>{formatDate(user.lastLoginAt) || 'Never'}</strong></div>
-                <div><span className="text-muted-foreground block text-xs mb-0.5">Last IP</span><strong>{user.lastLoginIp || 'N/A'}</strong></div>
-                <div><span className="text-muted-foreground block text-xs mb-0.5">Account Locked Until</span><strong>{user.lockedUntil ? formatDate(user.lockedUntil) : 'Not locked'}</strong></div>
-                <div><span className="text-muted-foreground block text-xs mb-0.5">Created At</span><strong>{formatDate(user.createdAt)}</strong></div>
+                <InfoItem label="Total Logins"><span className="text-2xl font-bold">{String(user.loginCount || 0)}</span></InfoItem>
+                <InfoItem label="Failed Attempts"><span className="text-2xl font-bold">{String(user.failedLoginAttempts || 0)}</span></InfoItem>
+                <InfoItem label="Last Login">{formatDate(user.lastLoginAt) || 'Never'}</InfoItem>
+                <InfoItem label="Last IP">{user.lastLoginIp || 'N/A'}</InfoItem>
+                <InfoItem label="Locked Until">{user.lockedUntil ? formatDate(user.lockedUntil) : 'Not locked'}</InfoItem>
+                <InfoItem label="Created At">{formatDate(user.createdAt)}</InfoItem>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+/** Small helper to avoid repeating markup */
+function InfoItem({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <span className="text-muted-foreground block text-xs mb-0.5">{label}</span>
+      <strong>{children}</strong>
     </div>
   );
 }
