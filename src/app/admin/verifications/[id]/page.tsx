@@ -223,7 +223,7 @@ export default function VerificationDetailPage() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-6">
-            <PremiumAvatar name={user.fullName} imageUrl={user.memberProfile?.profilePhotoUrl} size="xl" />
+            <PremiumAvatar name={user.fullName} src={user.memberProfile?.profilePhotoUrl} size="xl" />
 
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm">
               <InfoRow label="Full Name" value={user.fullName} />

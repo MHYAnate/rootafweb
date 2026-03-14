@@ -135,7 +135,7 @@ export default function AdminUserDetailPage() {
           <div className="flex flex-col md:flex-row gap-6">
             <PremiumAvatar
               name={user.fullName}
-              imageUrl={mp?.profilePhotoUrl}
+              src={mp?.profilePhotoUrl}
               size="xl"
             />
             <div className="flex-1">

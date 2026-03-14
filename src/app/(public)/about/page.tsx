@@ -408,7 +408,7 @@ export default function AboutPage() {
                     <CardContent className="p-6 text-center">
                       <PremiumAvatar
                         name={leader.fullName}
-                        imageUrl={leader.photoUrl || leader.photoThumbnailUrl}
+                        src={leader.photoUrl || leader.photoThumbnailUrl}
                         size="xl"
                         className="mx-auto mb-4"
                       />

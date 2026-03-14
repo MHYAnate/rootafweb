@@ -619,7 +619,7 @@ export default function AdminLeadershipPage() {
                 <div className="flex items-start justify-between mb-4">
                   <PremiumAvatar
                     name={leader.fullName}
-                    imageUrl={leader.photoUrl || leader.photoThumbnailUrl}
+                    src={leader.photoUrl || leader.photoThumbnailUrl}
                     size="lg"
                   />
                   <div className="flex gap-1">

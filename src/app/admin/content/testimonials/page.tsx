@@ -281,7 +281,7 @@ export default function AdminTestimonialsPage() {
               <div className="h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
               <CardContent className="p-5">
                 <div className="flex items-start gap-4">
-                  <PremiumAvatar name={t.personName} imageUrl={t.photoUrl} size="md" />
+                  <PremiumAvatar name={t.personName} src={t.photoUrl} size="md" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <div>
