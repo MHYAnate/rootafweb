@@ -140,7 +140,7 @@ export function AdminSidebar() {
             <p className="text-xs font-semibold text-primary uppercase tracking-wider">
               Admin Portal
             </p>
-            <p className="text-[11px] text-muted-foreground">URAFD</p>
+            <p className="text-[11px] text-muted-foreground">RootAF</p>
           </div>
         </div>
 

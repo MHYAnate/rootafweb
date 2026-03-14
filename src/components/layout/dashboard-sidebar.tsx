@@ -108,7 +108,7 @@ export function DashboardSidebar() {
         <div className="mt-8 pt-6 border-t border-border/50">
           <div className="flex items-center gap-2 px-3.5 text-xs text-muted-foreground">
             <Leaf className="h-3.5 w-3.5 text-primary" />
-            <span>URAFD Platform</span>
+            <span>RootAF Platform</span>
           </div>
         </div>
       </div>
