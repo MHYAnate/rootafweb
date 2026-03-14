@@ -172,7 +172,7 @@ export default function AdminEventsPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <ImageUpload onUploadComplete={(r) => updateForm({ featuredImageUrl: r?.imageUrl || '' })} folder="events" currentImage={form.featuredImageUrl} label="Featured Image" />
+            <ImageUpload onUploadComplete={(r) => updateForm({ featuredImageUrl: r?.imageUrl || '' })} folder="events" currentImage={form.featuredImageUrl} label="Featured Image" useAdminEndpoint />
 
             <div className="space-y-2">
               <Label>Event Title *</Label>

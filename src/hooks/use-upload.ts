@@ -1,3 +1,27 @@
+// // 'use client';
+
+// // import { useState } from 'react';
+// // import { useMutation } from '@tanstack/react-query';
+// // import { toast } from 'sonner';
+// // import { uploadApi } from '@/lib/api/upload.api';
+
+// // export function useUploadImage() {
+// //   const [uploading, setUploading] = useState(false);
+
+// //   const mutation = useMutation({
+// //     mutationFn: ({ file, folder }: { file: File; folder: string }) => {
+// //       setUploading(true);
+// //       return uploadApi.uploadImage(file, folder);
+// //     },
+// //     onSuccess: () => setUploading(false),
+// //     onError: (e: any) => {
+// //       setUploading(false);
+// //       toast.error(e.response?.data?.message || 'Upload failed');
+// //     },
+// //   });
+
+// //   return { ...mutation, uploading };
+// // }
 // 'use client';
 
 // import { useState } from 'react';
@@ -13,7 +37,29 @@
 //       setUploading(true);
 //       return uploadApi.uploadImage(file, folder);
 //     },
-//     onSuccess: () => setUploading(false),
+//     onSuccess: () => {
+//       setUploading(false);
+//     },
+//     onError: (e: any) => {
+//       setUploading(false);
+//       toast.error(e.response?.data?.message || 'Upload failed');
+//     },
+//   });
+
+//   return { ...mutation, uploading };
+// }
+
+// export function useUploadImages() {
+//   const [uploading, setUploading] = useState(false);
+
+//   const mutation = useMutation({
+//     mutationFn: ({ files, folder }: { files: File[]; folder: string }) => {
+//       setUploading(true);
+//       return uploadApi.uploadImages(files, folder);
+//     },
+//     onSuccess: () => {
+//       setUploading(false);
+//     },
 //     onError: (e: any) => {
 //       setUploading(false);
 //       toast.error(e.response?.data?.message || 'Upload failed');
@@ -29,6 +75,7 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { uploadApi } from '@/lib/api/upload.api';
 
+// User upload
 export function useUploadImage() {
   const [uploading, setUploading] = useState(false);
 
@@ -37,9 +84,7 @@ export function useUploadImage() {
       setUploading(true);
       return uploadApi.uploadImage(file, folder);
     },
-    onSuccess: () => {
-      setUploading(false);
-    },
+    onSuccess: () => setUploading(false),
     onError: (e: any) => {
       setUploading(false);
       toast.error(e.response?.data?.message || 'Upload failed');
@@ -49,6 +94,26 @@ export function useUploadImage() {
   return { ...mutation, uploading };
 }
 
+// Admin upload
+export function useAdminUploadImage() {
+  const [uploading, setUploading] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: ({ file, folder }: { file: File; folder: string }) => {
+      setUploading(true);
+      return uploadApi.adminUploadImage(file, folder);
+    },
+    onSuccess: () => setUploading(false),
+    onError: (e: any) => {
+      setUploading(false);
+      toast.error(e.response?.data?.message || 'Upload failed');
+    },
+  });
+
+  return { ...mutation, uploading };
+}
+
+// User multi-upload
 export function useUploadImages() {
   const [uploading, setUploading] = useState(false);
 
@@ -57,9 +122,26 @@ export function useUploadImages() {
       setUploading(true);
       return uploadApi.uploadImages(files, folder);
     },
-    onSuccess: () => {
+    onSuccess: () => setUploading(false),
+    onError: (e: any) => {
       setUploading(false);
+      toast.error(e.response?.data?.message || 'Upload failed');
     },
+  });
+
+  return { ...mutation, uploading };
+}
+
+// Admin multi-upload
+export function useAdminUploadImages() {
+  const [uploading, setUploading] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: ({ files, folder }: { files: File[]; folder: string }) => {
+      setUploading(true);
+      return uploadApi.adminUploadImages(files, folder);
+    },
+    onSuccess: () => setUploading(false),
     onError: (e: any) => {
       setUploading(false);
       toast.error(e.response?.data?.message || 'Upload failed');
