@@ -528,7 +528,7 @@ export function StatsSection() {
         </div>
 
         {/* Breakdowns */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-10">
+        {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-10">
           <div
             className={cn(
               'rounded-2xl border border-border/40 bg-card/80 backdrop-blur-sm p-6 sm:p-7',
@@ -574,7 +574,7 @@ export function StatsSection() {
             </div>
             <BreakdownBar items={productBreakdown} />
           </div>
-        </div>
+        </div> */}
 
         {/* Engagement */}
         <div
@@ -584,7 +584,7 @@ export function StatsSection() {
           )}
           style={{ animationDelay: '0.9s' }}
         >
-          <div className="flex items-center gap-3 mb-5">
+          {/* <div className="flex items-center gap-3 mb-5">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 shadow-md">
               <Eye className="h-4 w-4 text-white" />
             </div>
@@ -592,14 +592,14 @@ export function StatsSection() {
               <h3 className="text-sm font-bold text-foreground">Platform Engagement</h3>
               <p className="text-[11px] text-muted-foreground">Total views across all listings</p>
             </div>
-          </div>
+          </div> */}
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <MiniStatPill icon={Users} label="Profile Views" value={stats.engagement.totalProfileViews} />
             <MiniStatPill icon={Package} label="Product Views" value={stats.engagement.totalProductViews} />
             <MiniStatPill icon={Wrench} label="Service Views" value={stats.engagement.totalServiceViews} />
             <MiniStatPill icon={Hammer} label="Tool Views" value={stats.engagement.totalToolViews} />
-          </div>
+          </div> */}
 
           {stats.coverage.topStates?.length > 0 && (
             <div className="mt-6 pt-5 border-t border-border/40">
