@@ -1,13 +1,10 @@
 // app/offline/page.tsx
 
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { WifiOff, RefreshCw, Home } from 'lucide-react';
-
-export const metadata = {
-  title: 'Offline',
-  description: 'You are currently offline.',
-};
 
 export default function OfflinePage() {
   return (
