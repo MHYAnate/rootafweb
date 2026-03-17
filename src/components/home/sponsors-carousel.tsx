@@ -702,13 +702,13 @@ export function SponsorsCarousel({ className }: { className?: string }) {
           <div className="flex items-center justify-center gap-6 md:gap-10 mt-8">
             {[
               { label: 'Partners', count: partners.length, icon: Handshake },
-              { label: 'Sponsors', count: sponsors.length, icon: Heart },
-              {
-                label: 'Years Together',
-                // count: new Date().getFullYear() - (featured[0]?.partnershipSince ? new Date(featured[0].partnershipSince).getFullYear() : 0),
-                icon: Building2,
-              },
-            ].map(({ label, icon: Icon }) => (
+              { label: 'Sponsors', count: sponsors.length, icon: Heart }
+              // {
+              //   label: 'Years Together',
+              //   count: new Date().getFullYear() - (featured[0]?.partnershipSince ? new Date(featured[0].partnershipSince).getFullYear() : 0),
+              //   icon: Building2,
+              // },
+            ].map(({ label, count, icon: Icon }) => (
               <div key={label} className="flex items-center gap-2">
                 <div
                   className={cn(
@@ -719,7 +719,7 @@ export function SponsorsCarousel({ className }: { className?: string }) {
                   <Icon className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div className="text-left">
-                  {/* <p className="text-lg font-bold leading-none">{count}</p> */}
+                  <p className="text-lg font-bold leading-none">{count}</p>
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
                     {label}
                   </p>
