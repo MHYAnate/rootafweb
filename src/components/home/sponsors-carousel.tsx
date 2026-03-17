@@ -447,9 +447,9 @@ function FeaturedSponsorCard({ sponsor }: { sponsor: Sponsor }) {
                   {sponsor.sponsorshipLevel}
                 </Badge>
               )}
-              {/* <span className="text-[10px] text-muted-foreground/50">
+              <span className="text-[10px] text-muted-foreground/50">
                 Since {partnerYear}
-              </span> */}
+              </span>
             </div>
 
             {(sponsor.description || sponsor.shortDescription) && (
@@ -705,7 +705,7 @@ export function SponsorsCarousel({ className }: { className?: string }) {
               { label: 'Sponsors', count: sponsors.length, icon: Heart },
               {
                 label: 'Years Together',
-                count: new Date().getFullYear() - 2024 + 1,
+                count: new Date().getFullYear() - (featured[0]?.partnershipSince ? new Date(featured[0].partnershipSince).getFullYear() : 0),
                 icon: Building2,
               },
             ].map(({ label, count, icon: Icon }) => (
