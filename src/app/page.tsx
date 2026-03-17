@@ -5,6 +5,7 @@ import { StatsSection } from '@/components/home/stats-section';
 import { FeaturedMembers } from '@/components/home/featured-members';
 import { FeaturedProducts } from '@/components/home/featured-products';
 import { CTASection } from '@/components/home/cta-section';
+import { SponsorsCarousel } from '@/components/home/sponsors-carousel';
 
 export default function HomePage() {
   return (
@@ -15,6 +16,7 @@ export default function HomePage() {
         <StatsSection />
         <FeaturedMembers />
         <FeaturedProducts />
+        <SponsorsCarousel className="bg-gradient-to-b from-background via-muted/[0.02] to-background" />
         <CTASection />
       </main>
       <Footer />

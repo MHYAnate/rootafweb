@@ -654,7 +654,7 @@ export default function MarketplacePage() {
               <span className="text-foreground font-medium">
                 verified members
               </span>{' '}
-              across Nigeria. Your trusted platform for agricultural excellence.
+              across Nigeria. Your trusted platform for excellence.
             </p>
           </div>
 
