@@ -577,14 +577,14 @@ export function StatsSection() {
         </div> */}
 
         {/* Engagement */}
-        <div
+        {/* <div
           className={cn(
             'rounded-2xl border border-border/40 bg-card/80 backdrop-blur-sm p-6 sm:p-7',
             'animate-fade-up',
           )}
           style={{ animationDelay: '0.9s' }}
         >
-          {/* <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-3 mb-5">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 shadow-md">
               <Eye className="h-4 w-4 text-white" />
             </div>
@@ -592,16 +592,16 @@ export function StatsSection() {
               <h3 className="text-sm font-bold text-foreground">Platform Engagement</h3>
               <p className="text-[11px] text-muted-foreground">Total views across all listings</p>
             </div>
-          </div> */}
+          </div>
 
-          {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <MiniStatPill icon={Users} label="Profile Views" value={stats.engagement.totalProfileViews} />
             <MiniStatPill icon={Package} label="Product Views" value={stats.engagement.totalProductViews} />
             <MiniStatPill icon={Wrench} label="Service Views" value={stats.engagement.totalServiceViews} />
             <MiniStatPill icon={Hammer} label="Tool Views" value={stats.engagement.totalToolViews} />
-          </div> */}
+          </div>
 
-          {/* {stats.coverage.topStates?.length > 0 && (
+          {stats.coverage.topStates?.length > 0 && (
             <div className="mt-6 pt-5 border-t border-border/40">
               <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-3">
                 Top States by Members
@@ -626,8 +626,8 @@ export function StatsSection() {
                 ))}
               </div>
             </div>
-          )} */}
-        </div>
+          )}
+        </div> */}
 
         {/* CTA */}
         <div className="text-center mt-14 animate-fade-up" style={{ animationDelay: '1s' }}>
