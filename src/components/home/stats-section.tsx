@@ -601,7 +601,7 @@ export function StatsSection() {
             <MiniStatPill icon={Hammer} label="Tool Views" value={stats.engagement.totalToolViews} />
           </div> */}
 
-          {stats.coverage.topStates?.length > 0 && (
+          {/* {stats.coverage.topStates?.length > 0 && (
             <div className="mt-6 pt-5 border-t border-border/40">
               <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-3">
                 Top States by Members
@@ -626,7 +626,7 @@ export function StatsSection() {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* CTA */}
