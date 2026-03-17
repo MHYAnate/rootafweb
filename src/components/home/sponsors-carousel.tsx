@@ -447,9 +447,9 @@ function FeaturedSponsorCard({ sponsor }: { sponsor: Sponsor }) {
                   {sponsor.sponsorshipLevel}
                 </Badge>
               )}
-              <span className="text-[10px] text-muted-foreground/50">
+              {/* <span className="text-[10px] text-muted-foreground/50">
                 Since {partnerYear}
-              </span>
+              </span> */}
             </div>
 
             {(sponsor.description || sponsor.shortDescription) && (
