@@ -1,6 +1,6 @@
 // public/sw.js
 
-const CACHE_VERSION = 'v1.0.0';
+const CACHE_VERSION = 'v1.0.1';
 const STATIC_CACHE = `rootaf-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `rootaf-dynamic-${CACHE_VERSION}`;
 const IMAGE_CACHE = `rootaf-images-${CACHE_VERSION}`;
@@ -59,7 +59,9 @@ function isApiRequest(req) {
   return url.pathname.startsWith('/api/') || url.origin !== self.location.origin;
 }
 
-// ── INSTALL ──
+// ═══════════════════════════════════════════════════════════
+// INSTALL
+// ═══════════════════════════════════════════════════════════
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing:', CACHE_VERSION);
   event.waitUntil(
@@ -70,7 +72,9 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// ── ACTIVATE ──
+// ═══════════════════════════════════════════════════════════
+// ACTIVATE
+// ═══════════════════════════════════════════════════════════
 self.addEventListener('activate', (event) => {
   console.log('[SW] Activating:', CACHE_VERSION);
   const keep = [STATIC_CACHE, DYNAMIC_CACHE, IMAGE_CACHE, API_CACHE];
@@ -86,7 +90,9 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// ── FETCH ──
+// ═══════════════════════════════════════════════════════════
+// FETCH — Network First for API, Cache First for assets
+// ═══════════════════════════════════════════════════════════
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET' || !request.url.startsWith('http')) return;
@@ -145,7 +151,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network First: API
+  // ══════════════════════════════════════════════
+  // Network First: API — always try fresh data
+  // ══════════════════════════════════════════════
   if (isApiRequest(request)) {
     event.respondWith(
       fetch(request)
@@ -164,24 +172,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // SWR: navigation
+  // Network First: navigation pages
   if (isNavigationRequest(request)) {
     event.respondWith(
-      caches.match(request).then((cached) => {
-        const net = fetch(request)
-          .then((res) => {
-            if (res.ok) {
-              const clone = res.clone();
-              caches.open(DYNAMIC_CACHE).then((c) => {
-                c.put(request, clone);
-                trimCache(DYNAMIC_CACHE, LIMITS.dynamic);
-              });
-            }
-            return res;
-          })
-          .catch(() => caches.match('/offline'));
-        return cached || net;
-      }),
+      fetch(request)
+        .then((res) => {
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(DYNAMIC_CACHE).then((c) => {
+              c.put(request, clone);
+              trimCache(DYNAMIC_CACHE, LIMITS.dynamic);
+            });
+          }
+          return res;
+        })
+        .catch(() =>
+          caches.match(request).then((cached) => cached || caches.match('/offline')),
+        ),
     );
     return;
   }
@@ -203,7 +210,9 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// ── PUSH ──
+// ═══════════════════════════════════════════════════════════
+// PUSH NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════
 self.addEventListener('push', (event) => {
   let data = {
     title: 'RootAF',
@@ -235,7 +244,9 @@ self.addEventListener('push', (event) => {
   );
 });
 
-// ── NOTIFICATION CLICK ──
+// ═══════════════════════════════════════════════════════════
+// NOTIFICATION CLICK
+// ═══════════════════════════════════════════════════════════
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   if (event.action === 'dismiss') return;
@@ -255,7 +266,9 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-// ── BACKGROUND SYNC ──
+// ═══════════════════════════════════════════════════════════
+// BACKGROUND SYNC
+// ═══════════════════════════════════════════════════════════
 self.addEventListener('sync', (event) => {
   if (event.tag === 'rootaf-sync') {
     event.waitUntil(
@@ -268,15 +281,141 @@ self.addEventListener('sync', (event) => {
   }
 });
 
-// ── MESSAGE ──
+// ═══════════════════════════════════════════════════════════
+// MESSAGE HANDLER — cache management from main thread
+// ═══════════════════════════════════════════════════════════
 self.addEventListener('message', (event) => {
-  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
-  if (event.data?.type === 'GET_VERSION')
+  const { type } = event.data || {};
+
+  // Skip waiting for update
+  if (type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+
+  // Return current version
+  if (type === 'GET_VERSION') {
     event.ports[0]?.postMessage({ version: CACHE_VERSION });
-  if (event.data?.type === 'CLEAR_CACHES')
+  }
+
+  // ── Clear ALL caches ──
+  if (type === 'CLEAR_CACHES') {
     caches.keys().then((names) =>
       Promise.all(names.map((n) => caches.delete(n))).then(() =>
         event.ports[0]?.postMessage({ cleared: true }),
       ),
     );
+  }
+
+  // ══════════════════════════════════════════════
+  // REFRESH API CACHE — purge stale API data
+  // Called on every successful app load/refresh
+  // ══════════════════════════════════════════════
+  if (type === 'REFRESH_API_CACHE') {
+    console.log('[SW] Refreshing API cache — purging stale data');
+
+    caches
+      .open(API_CACHE)
+      .then((cache) => {
+        return cache.keys().then((requests) => {
+          // Delete all API cached responses so fresh ones are fetched
+          return Promise.all(requests.map((req) => cache.delete(req)));
+        });
+      })
+      .then(() => {
+        console.log('[SW] API cache cleared — fresh data will be fetched');
+        event.ports[0]?.postMessage({
+          refreshed: true,
+          timestamp: Date.now(),
+        });
+      })
+      .catch((err) => {
+        console.error('[SW] API cache refresh failed:', err);
+        event.ports[0]?.postMessage({ refreshed: false, error: String(err) });
+      });
+  }
+
+  // ══════════════════════════════════════════════
+  // REFRESH DYNAMIC CACHE — purge stale pages
+  // ══════════════════════════════════════════════
+  if (type === 'REFRESH_DYNAMIC_CACHE') {
+    console.log('[SW] Refreshing dynamic page cache');
+
+    caches
+      .open(DYNAMIC_CACHE)
+      .then((cache) => {
+        return cache.keys().then((requests) => {
+          return Promise.all(requests.map((req) => cache.delete(req)));
+        });
+      })
+      .then(() => {
+        event.ports[0]?.postMessage({
+          refreshed: true,
+          timestamp: Date.now(),
+        });
+      })
+      .catch((err) => {
+        event.ports[0]?.postMessage({ refreshed: false, error: String(err) });
+      });
+  }
+
+  // ══════════════════════════════════════════════
+  // REFRESH ALL DATA — purge API + dynamic caches
+  // Keep static assets & images for performance
+  // ══════════════════════════════════════════════
+  if (type === 'REFRESH_ALL_DATA') {
+    console.log('[SW] Refreshing all data caches');
+
+    Promise.all([
+      caches.open(API_CACHE).then((cache) =>
+        cache.keys().then((reqs) =>
+          Promise.all(reqs.map((r) => cache.delete(r))),
+        ),
+      ),
+      caches.open(DYNAMIC_CACHE).then((cache) =>
+        cache.keys().then((reqs) =>
+          Promise.all(reqs.map((r) => cache.delete(r))),
+        ),
+      ),
+    ])
+      .then(() => {
+        console.log('[SW] All data caches refreshed');
+        event.ports[0]?.postMessage({
+          refreshed: true,
+          timestamp: Date.now(),
+        });
+
+        // Notify all clients to refetch
+        self.clients.matchAll().then((clients) => {
+          clients.forEach((client) => {
+            client.postMessage({
+              type: 'CACHES_REFRESHED',
+              timestamp: Date.now(),
+            });
+          });
+        });
+      })
+      .catch((err) => {
+        event.ports[0]?.postMessage({ refreshed: false, error: String(err) });
+      });
+  }
+
+  // ══════════════════════════════════════════════
+  // GET CACHE STATUS — report what's cached
+  // ══════════════════════════════════════════════
+  if (type === 'GET_CACHE_STATUS') {
+    Promise.all([
+      caches.open(STATIC_CACHE).then((c) => c.keys().then((k) => k.length)),
+      caches.open(DYNAMIC_CACHE).then((c) => c.keys().then((k) => k.length)),
+      caches.open(IMAGE_CACHE).then((c) => c.keys().then((k) => k.length)),
+      caches.open(API_CACHE).then((c) => c.keys().then((k) => k.length)),
+    ]).then(([staticCount, dynamicCount, imageCount, apiCount]) => {
+      event.ports[0]?.postMessage({
+        static: staticCount,
+        dynamic: dynamicCount,
+        images: imageCount,
+        api: apiCount,
+        version: CACHE_VERSION,
+      });
+    });
+  }
 });

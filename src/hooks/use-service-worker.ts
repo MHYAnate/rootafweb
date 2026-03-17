@@ -13,10 +13,22 @@ interface ServiceWorkerState {
   error: Error | null;
 }
 
+interface CacheStatus {
+  static: number;
+  dynamic: number;
+  images: number;
+  api: number;
+  version: string;
+}
+
 interface UseServiceWorkerReturn extends ServiceWorkerState {
   update: () => Promise<void>;
   skipWaiting: () => void;
   clearCaches: () => Promise<boolean>;
+  refreshApiCache: () => Promise<boolean>;
+  refreshDynamicCache: () => Promise<boolean>;
+  refreshAllData: () => Promise<boolean>;
+  getCacheStatus: () => Promise<CacheStatus | null>;
   getVersion: () => Promise<string | null>;
 }
 
@@ -32,7 +44,6 @@ export function useServiceWorker(): UseServiceWorkerReturn {
 
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
 
-  // ── Register service worker ──
   useEffect(() => {
     const isSupported = 'serviceWorker' in navigator;
 
@@ -74,7 +85,7 @@ export function useServiceWorker(): UseServiceWorkerReturn {
           60 * 60 * 1000,
         );
 
-        // Listen for new worker waiting
+        // Detect waiting service worker
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           if (!newWorker) return;
@@ -106,7 +117,6 @@ export function useServiceWorker(): UseServiceWorkerReturn {
 
     registerSW();
 
-    // Reload on controller change (new SW took over)
     const onControllerChange = () => {
       console.log('[PWA] Controller changed — reloading');
       window.location.reload();
@@ -126,7 +136,7 @@ export function useServiceWorker(): UseServiceWorkerReturn {
     };
   }, []);
 
-  // ── Online / Offline tracking ──
+  // Online / offline
   useEffect(() => {
     const handleOnline = () =>
       setState((prev) => ({ ...prev, isOnline: true }));
@@ -142,7 +152,33 @@ export function useServiceWorker(): UseServiceWorkerReturn {
     };
   }, []);
 
-  // ── Methods ──
+  // ── Helper to send messages to SW ──
+  const sendMessage = useCallback(
+    (type: string, timeout = 5000): Promise<any> => {
+      if (!navigator.serviceWorker.controller) {
+        return Promise.resolve(null);
+      }
+
+      return new Promise((resolve) => {
+        const channel = new MessageChannel();
+
+        const timer = setTimeout(() => {
+          resolve(null);
+        }, timeout);
+
+        channel.port1.onmessage = (event) => {
+          clearTimeout(timer);
+          resolve(event.data);
+        };
+
+        navigator.serviceWorker.controller!.postMessage({ type }, [
+          channel.port2,
+        ]);
+      });
+    },
+    [],
+  );
+
   const update = useCallback(async () => {
     if (registrationRef.current) {
       await registrationRef.current.update();
@@ -157,40 +193,43 @@ export function useServiceWorker(): UseServiceWorkerReturn {
   }, []);
 
   const clearCaches = useCallback(async (): Promise<boolean> => {
-    if (!navigator.serviceWorker.controller) return false;
+    const result = await sendMessage('CLEAR_CACHES');
+    return result?.cleared ?? false;
+  }, [sendMessage]);
 
-    return new Promise((resolve) => {
-      const channel = new MessageChannel();
-      channel.port1.onmessage = (event) => {
-        resolve(event.data?.cleared ?? false);
-      };
-      navigator.serviceWorker.controller!.postMessage(
-        { type: 'CLEAR_CACHES' },
-        [channel.port2],
-      );
-    });
-  }, []);
+  const refreshApiCache = useCallback(async (): Promise<boolean> => {
+    const result = await sendMessage('REFRESH_API_CACHE');
+    return result?.refreshed ?? false;
+  }, [sendMessage]);
+
+  const refreshDynamicCache = useCallback(async (): Promise<boolean> => {
+    const result = await sendMessage('REFRESH_DYNAMIC_CACHE');
+    return result?.refreshed ?? false;
+  }, [sendMessage]);
+
+  const refreshAllData = useCallback(async (): Promise<boolean> => {
+    const result = await sendMessage('REFRESH_ALL_DATA');
+    return result?.refreshed ?? false;
+  }, [sendMessage]);
+
+  const getCacheStatus = useCallback(async (): Promise<CacheStatus | null> => {
+    return sendMessage('GET_CACHE_STATUS');
+  }, [sendMessage]);
 
   const getVersion = useCallback(async (): Promise<string | null> => {
-    if (!navigator.serviceWorker.controller) return null;
-
-    return new Promise((resolve) => {
-      const channel = new MessageChannel();
-      channel.port1.onmessage = (event) => {
-        resolve(event.data?.version ?? null);
-      };
-      navigator.serviceWorker.controller!.postMessage(
-        { type: 'GET_VERSION' },
-        [channel.port2],
-      );
-    });
-  }, []);
+    const result = await sendMessage('GET_VERSION');
+    return result?.version ?? null;
+  }, [sendMessage]);
 
   return {
     ...state,
     update,
     skipWaiting,
     clearCaches,
+    refreshApiCache,
+    refreshDynamicCache,
+    refreshAllData,
+    getCacheStatus,
     getVersion,
   };
 }
