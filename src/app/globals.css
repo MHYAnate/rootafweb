@@ -510,3 +510,130 @@
 .animate-slide-up {
   animation: slide-up 0.8s ease-out forwards;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   PWA — append to end of your existing globals.css
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── PWA Safe Area ─── */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .pwa-safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pwa-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pwa-safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
+  .pwa-safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* ─── Standalone Mode ─── */
+@media (display-mode: standalone) {
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: contain;
+  }
+
+  p, span, h1, h2, h3, h4, h5, h6, li, td, th,
+  blockquote, pre, code, label {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  input, textarea, [contenteditable] {
+    -webkit-user-select: auto;
+    user-select: auto;
+  }
+
+  html {
+    overscroll-behavior: none;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  header {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* ─── PWA Prompt Animations ─── */
+@keyframes pwa-slide-in-bottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pwa-slide-out-bottom {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes pwa-slide-in-top {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pwa-slide-out-top {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes pwa-slide-in-bottom-sm {
+  from {
+    transform: translate(-50%, 1rem);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.pwa-slide-in-bottom {
+  animation: pwa-slide-in-bottom 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+.pwa-slide-out-bottom {
+  animation: pwa-slide-out-bottom 0.35s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+.pwa-slide-in-top {
+  animation: pwa-slide-in-top 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+.pwa-slide-out-top {
+  animation: pwa-slide-out-top 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+.pwa-slide-in-bottom-sm {
+  animation: pwa-slide-in-bottom-sm 0.4s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
