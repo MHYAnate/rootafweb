@@ -301,7 +301,7 @@ function DetailRow({
           {copyable && !isEmpty && (
             <button
               onClick={handleCopy}
-              className="h-6 w-6 rounded-md hover:bg-muted flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
+              className="h-6 w-6 rounded-md hover:bg-muted flex items-center justify-center transition-colors"
               title="Copy"
             >
               <Copy className="h-3 w-3 text-muted-foreground" />
@@ -668,7 +668,7 @@ function SponsorDetailSheet({
 }
 
 // ═══════════════════════════════════════════════════════════
-// SPONSOR CARD COMPONENT
+// SPONSOR CARD COMPONENT (FIXED: actions always visible)
 // ═══════════════════════════════════════════════════════════
 
 function SponsorCard({
@@ -734,8 +734,8 @@ function SponsorCard({
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* Actions — always visible (no hover gating) */}
+          <div className="flex gap-0.5 shrink-0">
             <Button
               variant="ghost"
               size="icon"
@@ -1331,7 +1331,8 @@ export default function AdminSponsorsPage() {
                   {sponsor.isFeatured && (
                     <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400 shrink-0" />
                   )}
-                  <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* Actions — always visible (no hover gating) */}
+                  <div className="flex gap-0.5">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -1384,11 +1385,11 @@ export default function AdminSponsorsPage() {
         onEdit={openEdit}
       />
 
-      {/* ═══════════ Create / Edit Form Dialog ═══════════ */}
+      {/* ═══════════ Create / Edit Form Dialog (FIXED: flex layout for proper scrolling) ═══════════ */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="rounded-2xl max-w-3xl max-h-[92vh] overflow-y-auto p-0">
-          {/* Header */}
-          <div className="sticky top-0 z-10 bg-card border-b border-border/50 rounded-t-2xl">
+        <DialogContent className="rounded-2xl max-w-2xl max-h-[90vh] overflow-y-auto">
+          {/* Header — fixed at top */}
+          <div className="shrink-0 bg-card border-b border-border/50 rounded-t-2xl">
             <div
               className="h-1 rounded-t-2xl"
               style={{ background: 'var(--gradient-premium)' }}
@@ -1415,7 +1416,8 @@ export default function AdminSponsorsPage() {
             </DialogHeader>
           </div>
 
-          <div className="p-5 space-y-8">
+          {/* Scrollable form body */}
+          <div className="flex-1 overflow-y-auto p-5 space-y-8 max-h-[72vh] ">
             {/* ── Logo & Identity ── */}
             <FormSection
               title="Logo & Identity"
@@ -1845,8 +1847,8 @@ export default function AdminSponsorsPage() {
             </FormSection>
           </div>
 
-          {/* Footer */}
-          <div className="sticky bottom-0 border-t border-border/50 bg-card p-4 flex justify-end gap-2 rounded-b-2xl">
+          {/* Footer — fixed at bottom */}
+          <div className="shrink-0 border-t border-border/50 bg-card p-4 flex justify-end gap-2 rounded-b-2xl">
             <Button
               variant="outline"
               onClick={() => setShowForm(false)}
