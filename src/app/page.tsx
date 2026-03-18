@@ -16,7 +16,7 @@ export default function HomePage() {
         <StatsSection />
         <FeaturedMembers />
         <FeaturedProducts />
-        <SponsorsCarousel className="bg-gradient-to-b from-background via-muted/[0.02] to-background" />
+        {/* <SponsorsCarousel className="bg-gradient-to-b from-background via-muted/[0.02] to-background" /> */}
         <CTASection />
       </main>
       <Footer />
