@@ -14,10 +14,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  Building2,
   Award,
   ExternalLink,
   Star,
+  Building,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -123,8 +123,6 @@ function SponsorLogo({
     lg: 'h-20 w-20 rounded-2xl text-2xl',
   };
 
-  const typeConfig = TYPE_CONFIG[sponsor.type];
-
   if (sponsor.logoThumbnailUrl || sponsor.logoUrl) {
     return (
       <div
@@ -143,7 +141,6 @@ function SponsorLogo({
     );
   }
 
-  // Generate deterministic color from name
   const colors = [
     'from-emerald-500/80 to-teal-600/80',
     'from-blue-500/80 to-indigo-600/80',
@@ -192,7 +189,6 @@ function MarqueeRow({
 }) {
   const [isPaused, setIsPaused] = useState(false);
 
-  // Duplicate array for seamless loop
   const items = [...sponsors, ...sponsors, ...sponsors];
 
   return (
@@ -201,7 +197,6 @@ function MarqueeRow({
       onMouseEnter={() => pauseOnHover && setIsPaused(true)}
       onMouseLeave={() => pauseOnHover && setIsPaused(false)}
     >
-      {/* Fade edges */}
       <div className="absolute left-0 top-0 bottom-0 w-20 md:w-40 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none" />
       <div className="absolute right-0 top-0 bottom-0 w-20 md:w-40 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none" />
 
@@ -224,7 +219,7 @@ function MarqueeRow({
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// MARQUEE CARD (Compact)
+// MARQUEE CARD
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function MarqueeCard({ sponsor }: { sponsor: Sponsor }) {
@@ -235,7 +230,6 @@ function MarqueeCard({ sponsor }: { sponsor: Sponsor }) {
 
   return (
     <div className="group relative shrink-0">
-      {/* Hover glow */}
       <div
         className={cn(
           'absolute -inset-px rounded-2xl opacity-0 blur-sm transition-all duration-500',
@@ -331,7 +325,7 @@ function MarqueeCard({ sponsor }: { sponsor: Sponsor }) {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// FEATURED SPONSOR CARD (Larger, for spotlight)
+// FEATURED SPONSOR CARD
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function FeaturedSponsorCard({ sponsor }: { sponsor: Sponsor }) {
@@ -344,7 +338,6 @@ function FeaturedSponsorCard({ sponsor }: { sponsor: Sponsor }) {
 
   return (
     <div className="group relative">
-      {/* Outer glow */}
       <div
         className={cn(
           'absolute -inset-1 rounded-3xl opacity-0 blur-lg transition-all duration-700',
@@ -363,7 +356,6 @@ function FeaturedSponsorCard({ sponsor }: { sponsor: Sponsor }) {
           'p-6 md:p-8',
         )}
       >
-        {/* Top shine line */}
         <div
           className={cn(
             'absolute top-0 left-0 right-0 h-px',
@@ -372,7 +364,6 @@ function FeaturedSponsorCard({ sponsor }: { sponsor: Sponsor }) {
           )}
         />
 
-        {/* Featured star badge */}
         {sponsor.isFeatured && (
           <div className="absolute top-4 right-4">
             <div
@@ -392,7 +383,6 @@ function FeaturedSponsorCard({ sponsor }: { sponsor: Sponsor }) {
         )}
 
         <div className="flex flex-col md:flex-row gap-6 items-start">
-          {/* Logo */}
           <div className="relative">
             <div
               className={cn(
@@ -408,7 +398,6 @@ function FeaturedSponsorCard({ sponsor }: { sponsor: Sponsor }) {
             )}
           </div>
 
-          {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-start gap-3 flex-wrap">
               <h3 className="text-lg md:text-xl font-bold leading-tight">
@@ -476,7 +465,6 @@ function FeaturedSponsorCard({ sponsor }: { sponsor: Sponsor }) {
             )}
           </div>
 
-          {/* Action */}
           {sponsor.website && (
             <a
               href={sponsor.website}
@@ -504,7 +492,7 @@ function FeaturedSponsorCard({ sponsor }: { sponsor: Sponsor }) {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// LOGO-ONLY TICKER (Simple brand logo strip)
+// LOGO TICKER
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function LogoTicker({
@@ -583,7 +571,6 @@ function LogoTicker({
 function CarouselSkeleton() {
   return (
     <div className="space-y-8">
-      {/* Featured skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {[1, 2].map((i) => (
           <div
@@ -601,7 +588,6 @@ function CarouselSkeleton() {
           </div>
         ))}
       </div>
-      {/* Marquee skeleton */}
       <div className="flex gap-5 overflow-hidden">
         {[1, 2, 3, 4, 5].map((i) => (
           <div
@@ -615,7 +601,7 @@ function CarouselSkeleton() {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// MAIN EXPORT: SPONSORS CAROUSEL SECTION
+// MAIN EXPORT
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export function SponsorsCarousel({ className }: { className?: string }) {
@@ -666,9 +652,8 @@ export function SponsorsCarousel({ className }: { className?: string }) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ── Section Header ────────────────────────────────────────────── */}
+        {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
-          {/* Badge */}
           <div className="flex justify-center mb-6">
             <div
               className={cn(
@@ -702,12 +687,7 @@ export function SponsorsCarousel({ className }: { className?: string }) {
           <div className="flex items-center justify-center gap-6 md:gap-10 mt-8">
             {[
               { label: 'Partners', count: partners.length, icon: Handshake },
-              { label: 'Sponsors', count: sponsors.length, icon: Heart }
-              // {
-              //   label: 'Years Together',
-              //   count: new Date().getFullYear() - (featured[0]?.partnershipSince ? new Date(featured[0].partnershipSince).getFullYear() : 0),
-              //   icon: Building2,
-              // },
+              { label: 'Sponsors', count: sponsors.length, icon: Heart },
             ].map(({ label, count, icon: Icon }) => (
               <div key={label} className="flex items-center gap-2">
                 <div
@@ -729,7 +709,7 @@ export function SponsorsCarousel({ className }: { className?: string }) {
           </div>
         </div>
 
-        {/* ── Featured Spotlight ─────────────────────────────────────────── */}
+        {/* Featured Spotlight */}
         {featured.length > 0 && (
           <div className="mb-12">
             <div
@@ -747,7 +727,7 @@ export function SponsorsCarousel({ className }: { className?: string }) {
           </div>
         )}
 
-        {/* ── Marquee Carousel ──────────────────────────────────────────── */}
+        {/* Marquee Carousel */}
         {allSponsors.length > 2 && (
           <div className="space-y-4">
             <MarqueeRow
@@ -775,7 +755,7 @@ export function SponsorsCarousel({ className }: { className?: string }) {
           </div>
         )}
 
-        {/* ── If only a few items, no marquee – simple grid ─────────────── */}
+        {/* Simple grid fallback */}
         {allSponsors.length <= 2 && featured.length === 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl mx-auto">
             {allSponsors.map((sponsor) => (
@@ -784,7 +764,7 @@ export function SponsorsCarousel({ className }: { className?: string }) {
           </div>
         )}
 
-        {/* ── Logo Strip (Minimal / Trusted-by style) ────────────────────── */}
+        {/* Logo Strip */}
         {allSponsors.length > 3 && (
           <div className="mt-12 pt-10 border-t border-border/20">
             <p className="text-center text-xs text-muted-foreground/40 uppercase tracking-[0.2em] font-semibold mb-6">
@@ -794,7 +774,7 @@ export function SponsorsCarousel({ className }: { className?: string }) {
           </div>
         )}
 
-        {/* ── Bottom CTA ─────────────────────────────────────────────────── */}
+        {/* Bottom CTA */}
         <div className="flex justify-center mt-12">
           <Link href="/about#partners">
             <Button
@@ -815,7 +795,6 @@ export function SponsorsCarousel({ className }: { className?: string }) {
         </div>
       </div>
 
-      {/* ── CSS Keyframes ─────────────────────────────────────────────────── */}
       <style jsx global>{`
         @keyframes marquee-left {
           0% {
