@@ -526,7 +526,7 @@ function MobileDrawer({
           open ? 'translate-x-0' : '-translate-x-full',
         )}
       >
-        {/* Close button */}
+        {/* Close utton */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 z-10 h-8 w-8 rounded-lg bg-muted/60 hover:bg-muted flex items-center justify-center transition-all duration-200 active:scale-90"
@@ -542,7 +542,7 @@ function MobileDrawer({
 }
 
 /* ─── Main export ─── */
-export function AdminSidebar() {
+export function  AdminSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();

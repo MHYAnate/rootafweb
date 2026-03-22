@@ -49,7 +49,8 @@ export function VerificationCard({ user, className }: VerificationCardProps) {
                   <>
                     <span>•</span>
                     <span className="text-primary text-xs font-medium">
-                      {PROVIDER_TYPE_MAP[user.memberProfile.providerType] as any}
+                 {(PROVIDER_TYPE_MAP[user.memberProfile.providerType] as any)?.label ?? user.memberProfile.providerType}
+
                     </span>
                   </>
                 )}
