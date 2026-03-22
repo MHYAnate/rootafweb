@@ -94,7 +94,7 @@ export default function AdminUsersPage() {
         <>
           <UserTable
             users={data?.data || []}
-            title={`All Users (${data?.meta?.total || 0})`}
+            // title={`All Users (${data?.meta?.total || 0})`}
             onSuspend={(userId, reason) => suspendUser.mutate({ userId, reason })}
             onReactivate={(userId) => reactivateUser.mutate(userId)}
             onFeature={(memberId) => featureMember.mutate(memberId)}
