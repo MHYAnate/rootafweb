@@ -338,7 +338,76 @@ export function useUpdateAboutContent() {
     onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
   });
 }
+// ═══════════════════════════════════════════════════════════
+// OBJECTIVES
+// ═══════════════════════════════════════════════════════════
 
+export function useAdminCreateObjective() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: adminApi.createObjective,
+    onSuccess: () => {
+      toast.success('Objective created');
+      qc.invalidateQueries({ queryKey: ['about'] });
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+export function useAdminUpdateObjective() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      adminApi.updateObjective(id, data),
+    onSuccess: () => {
+      toast.success('Objective updated');
+      qc.invalidateQueries({ queryKey: ['about'] });
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+export function useAdminDeleteObjective() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: adminApi.deleteObjective,
+    onSuccess: () => {
+      toast.success('Objective deleted');
+      qc.invalidateQueries({ queryKey: ['about'] });
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONTACT & SOCIAL
+// ═══════════════════════════════════════════════════════════
+
+export function useAdminUpdateContact() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      adminApi.updateContact(id, data),
+    onSuccess: () => {
+      toast.success('Contact info updated');
+      qc.invalidateQueries({ queryKey: ['about'] });
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
+
+export function useAdminUpdateSocial() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      adminApi.updateSocial(id, data),
+    onSuccess: () => {
+      toast.success('Social link updated');
+      qc.invalidateQueries({ queryKey: ['about'] });
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+  });
+}
 // Leadership
 export function useAdminCreateLeadership() {
   const qc = useQueryClient();

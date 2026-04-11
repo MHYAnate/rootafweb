@@ -27,6 +27,7 @@ import {
   ChevronRight,
   Shield,
   Sparkles,
+  ImageIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -54,6 +55,7 @@ const navLinks = [
   { href: '/events', label: 'Events', icon: Calendar },
   { href: '/about', label: 'About', icon: Info },
   { href: '/contact', label: 'Contact', icon: Phone },
+  { href: '/gallery', label: 'Gallery', icon: ImageIcon },
 ];
 
 // ═══════════════════════════════════════════════════════════

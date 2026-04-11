@@ -79,6 +79,14 @@ const adminLinks = [
     permission: 'canManageContent' as const,
     group: 'Content',
   },
+  
+  {
+    href: '/admin/content/documents',
+    label: 'Documents',
+    icon: FileText,
+    permission: 'canManageContent' as const,
+    group: 'Content',
+  },
   {
     href: '/admin/content/sponsors',
     label: 'Sponsors',
