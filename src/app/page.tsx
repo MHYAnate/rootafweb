@@ -6,6 +6,7 @@ import { FeaturedMembers } from '@/components/home/featured-members';
 import { FeaturedProducts } from '@/components/home/featured-products';
 import { CTASection } from '@/components/home/cta-section';
 import  SponsorsCarousel  from '@/components/home/sponsors-carousel';
+import { AiChat } from '@/components/shared/ai-chat';
 
 export default function HomePage() {
   return (
@@ -19,6 +20,7 @@ export default function HomePage() {
         <SponsorsCarousel  />
         <CTASection />
       </main>
+      <AiChat />
       <Footer />
     </>
   );

@@ -58,4 +58,8 @@ export const aboutApi = {
     apiClient.get('/about').then((r) => ({
       data: r.data?.data?.social || [],
     })),
+
+    askAi: (question: string, context?: { userType?: string; state?: string; name?: string }) =>
+      apiClient.post('/ai/chat', { question, ...context }).then((r) => r.data),
 };
+
