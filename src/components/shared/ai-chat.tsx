@@ -126,22 +126,13 @@ const SUGGESTED_QUESTIONS = [
   },
   { 
     icon: Wrench, 
-    text: 'Equipment & fleet services', 
+    text: 'Equipments ', 
     category: 'Operations',
     color: 'text-amber-700',
     bg: 'bg-amber-50',
     border: 'border-amber-200',
     hover: 'hover:bg-amber-100 hover:border-amber-300'
-  },
-  { 
-    icon: TrendingUp, 
-    text: 'best place to open a new branch for poultry farming', 
-    category: 'Farming',
-    color: 'text-blue-700',
-    bg: 'bg-green-50',
-    border: 'border-green-200',
-    hover: 'hover:bg-green-100 hover:border-blue-300'
-  },
+  }
 ];
 
 const SOURCE_CONFIG: Record<string, {
