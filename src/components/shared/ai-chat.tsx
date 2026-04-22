@@ -135,12 +135,12 @@ const SUGGESTED_QUESTIONS = [
   },
   { 
     icon: TrendingUp, 
-    text: 'Financial performance Q3', 
-    category: 'Finance',
+    text: 'best place to open a new branch for poultry farming', 
+    category: 'Farming',
     color: 'text-blue-700',
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
-    hover: 'hover:bg-blue-100 hover:border-blue-300'
+    bg: 'bg-green-50',
+    border: 'border-green-200',
+    hover: 'hover:bg-green-100 hover:border-blue-300'
   },
 ];
 
