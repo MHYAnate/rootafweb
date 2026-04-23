@@ -708,7 +708,7 @@ export function AiChat() {
                     ref={inputRef}
                     value={input}
                     onChange={e => setInput(e.target.value)}
-                    placeholder="Ask about initiatives, leadership, outreach..."
+                    placeholder="Ask about  market insights, leadership and initiatives..."
                     className={cn(
                       "h-12 pl-4 pr-10 rounded-xl",
                       "bg-slate-50/50 border-slate-200/80",
