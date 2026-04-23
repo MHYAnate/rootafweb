@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   MessageCircle, X, Send, Loader2, Sparkles,
-  TrendingUp, ShoppingBag, Wrench, Building2,
-  Users, FileText, Phone, MapPin, Tag, Mail,
-  ExternalLink, CheckCircle2, Clock, Shield,
-  ChevronRight, Bot, UserRound, Zap
+  TrendingUp, Users, FileText, Phone, MapPin, 
+  Tag, Mail, ExternalLink, CheckCircle2, Shield,
+  ChevronRight, Bot, UserRound, Zap, HeartHandshake,
+  Globe,ShoppingBag,Wrench
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
@@ -60,52 +60,45 @@ interface Message {
   status?: 'sending' | 'sent' | 'error';
 }
 
-// ─── Design Tokens ───────────────────────────────────────────────────────────
-
-const THEME = {
-  emerald: {
-    50: '#ecfdf5',
-    100: '#d1fae5',
-    200: '#a7f3d0',
-    300: '#6ee7b7',
-    400: '#34d399',
-    500: '#10b981',
-    600: '#059669',
-    700: '#047857',
-    800: '#065f46',
-    900: '#064e3b',
-    950: '#022c22',
-  },
-  amber: {
-    50: '#fffbeb',
-    100: '#fef3c7',
-    200: '#fde68a',
-    300: '#fcd34d',
-    400: '#fbbf24',
-    500: '#f59e0b',
-    600: '#d97706',
-    700: '#b45309',
-    800: '#92400e',
-    900: '#78350f',
-  },
-  slate: {
-    50: '#f8fafc',
-    100: '#f1f5f9',
-    200: '#e2e8f0',
-    300: '#cbd5e1',
-    400: '#94a3b8',
-    500: '#64748b',
-    600: '#475569',
-    700: '#334155',
-    800: '#1e293b',
-    900: '#0f172a',
-    950: '#020617',
-  }
-};
-
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const SUGGESTED_QUESTIONS = [
+  // { 
+  //   icon: HeartHandshake, 
+  //   text: 'Foundation programs & impact', 
+  //   category: 'Initiatives',
+  //   color: 'text-emerald-700',
+  //   bg: 'bg-emerald-50/80',
+  //   border: 'border-emerald-200/60',
+  //   hover: 'hover:bg-emerald-100/80 hover:border-emerald-300'
+  // },
+  { 
+    icon: Users, 
+    text: 'Foundation leadership team', 
+    category: 'Leadership',
+    color: 'text-slate-700',
+    bg: 'bg-slate-50/80',
+    border: 'border-slate-200/60',
+    hover: 'hover:bg-slate-100/80 hover:border-slate-300'
+  },
+  // { 
+  //   icon: Globe, 
+  //   text: 'Community outreach initiatives', 
+  //   category: 'Operations',
+  //   color: 'text-amber-700',
+  //   bg: 'bg-amber-50/80',
+  //   border: 'border-amber-200/60',
+  //   hover: 'hover:bg-amber-100/80 hover:border-amber-300'
+  // },
+  { 
+    icon: TrendingUp, 
+    text: 'Who is Nuhu Ibrahim Majidadi?', 
+    category: 'Founder',
+    color: 'text-blue-700',
+    bg: 'bg-blue-50/80',
+    border: 'border-blue-200/60',
+    hover: 'hover:bg-blue-100/80 hover:border-blue-300'
+  },
   { 
     icon: ShoppingBag, 
     text: 'Commodity market analysis', 
@@ -115,32 +108,23 @@ const SUGGESTED_QUESTIONS = [
     border: 'border-emerald-200',
     hover: 'hover:bg-emerald-100 hover:border-emerald-300'
   },
-  { 
-    icon: Building2, 
-    text: 'Executive leadership team', 
-    category: 'Corporate',
-    color: 'text-slate-700',
-    bg: 'bg-slate-50',
-    border: 'border-slate-200',
-    hover: 'hover:bg-slate-100 hover:border-slate-300'
-  },
+  // { 
+  //   icon: Building2, 
+  //   text: 'Executive leadership team', 
+  //   category: 'Corporate',
+  //   color: 'text-slate-700',
+  //   bg: 'bg-slate-50',
+  //   border: 'border-slate-200',
+  //   hover: 'hover:bg-slate-100 hover:border-slate-300'
+  // },
   { 
     icon: Wrench, 
-    text: 'Equipment & fleet services', 
+    text: 'Equipment & tools services', 
     category: 'Operations',
     color: 'text-amber-700',
     bg: 'bg-amber-50',
     border: 'border-amber-200',
     hover: 'hover:bg-amber-100 hover:border-amber-300'
-  },
-  { 
-    icon: TrendingUp, 
-    text: 'Who is Nuhu Ibrahim Majidadi ?', 
-    category: 'Leadership',
-    color: 'text-blue-700',
-    bg: 'bg-green-50',
-    border: 'border-green-200',
-    hover: 'hover:bg-green-100 hover:border-blue-300'
   },
 ];
 
@@ -156,24 +140,24 @@ const SOURCE_CONFIG: Record<string, {
     icon: Users, 
     label: 'Verified Leadership', 
     color: 'text-indigo-700', 
-    bg: 'bg-indigo-50/80', 
-    border: 'border-indigo-200',
+    bg: 'bg-indigo-50/60', 
+    border: 'border-indigo-200/50',
     badge: 'bg-indigo-100 text-indigo-800'
   },
   ABOUT_CONTENT: { 
     icon: FileText, 
     label: 'Official Records', 
     color: 'text-slate-700', 
-    bg: 'bg-slate-50/80', 
-    border: 'border-slate-200',
+    bg: 'bg-slate-50/60', 
+    border: 'border-slate-200/50',
     badge: 'bg-slate-100 text-slate-800'
   },
   CONTACT: { 
     icon: Phone, 
     label: 'Verified Contact', 
     color: 'text-emerald-700', 
-    bg: 'bg-emerald-50/80', 
-    border: 'border-emerald-200',
+    bg: 'bg-emerald-50/60', 
+    border: 'border-emerald-200/50',
     badge: 'bg-emerald-100 text-emerald-800'
   },
 };
@@ -209,8 +193,8 @@ const SourceCard = memo(function SourceCard({ source, index }: { source: Source;
     icon: Tag, 
     label: source.type, 
     color: 'text-emerald-700', 
-    bg: 'bg-emerald-50/80', 
-    border: 'border-emerald-200',
+    bg: 'bg-emerald-50/60', 
+    border: 'border-emerald-200/50',
     badge: 'bg-emerald-100 text-emerald-800'
   };
   const Icon = cfg.icon;
@@ -222,16 +206,16 @@ const SourceCard = memo(function SourceCard({ source, index }: { source: Source;
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
       className={cn(
-        "group relative p-4 rounded-xl border transition-all duration-300",
-        "hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-0.5",
+        "group relative p-4 rounded-xl border backdrop-blur-sm transition-all duration-300",
+        "hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-0.5",
         cfg.bg, cfg.border
       )}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2.5">
           <div className={cn(
-            "p-2 rounded-lg bg-white border shadow-sm transition-transform duration-300 group-hover:scale-105",
-            cfg.border
+            "p-2 rounded-lg bg-white shadow-sm transition-transform duration-300 group-hover:scale-105",
+            cfg.border, "border"
           )}>
             <Icon className={cn("h-3.5 w-3.5", cfg.color)} />
           </div>
@@ -332,7 +316,7 @@ const TextParser = memo(function TextParser({ text }: { text: string }) {
           if (match) {
             return (
               <a key={i} href={match[2]} target="_blank" rel="noopener noreferrer" 
-                className="inline-flex items-center gap-0.5 text-emerald-600 hover:text-emerald-700 font-semibold underline decoration-emerald-300 underline-offset-2 transition-colors">
+                className="inline-flex items-center gap-0.5 text-emerald-600 hover:text-emerald-700 font-semibold underline decoration-emerald-300/50 underline-offset-2 transition-colors">
                 {match[1]}
                 <ExternalLink className="h-3 w-3" />
               </a>
@@ -364,7 +348,7 @@ const TextParser = memo(function TextParser({ text }: { text: string }) {
 const MessageSkeleton = memo(function MessageSkeleton() {
   return (
     <div className="flex gap-3 items-start w-full">
-      <div className="h-8 w-8 rounded-full bg-emerald-100 animate-pulse shrink-0" />
+      <div className="h-8 w-8 rounded-full bg-emerald-50 border border-emerald-100 animate-pulse shrink-0" />
       <div className="space-y-2.5 flex-1 max-w-[80%]">
         <div className="h-3 bg-slate-100 rounded-full w-3/4 animate-pulse" />
         <div className="h-3 bg-slate-100 rounded-full w-full animate-pulse" />
@@ -388,13 +372,13 @@ const SuggestedChip = memo(function SuggestedChip({
   
   return (
     <motion.button
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: index * 0.1 }}
+      transition={{ delay: index * 0.1, duration: 0.2 }}
       onClick={onClick}
       className={cn(
-        "flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition-all duration-200",
-        "hover:shadow-md active:scale-95",
+        "flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition-all duration-300",
+        "hover:shadow-[0_2px_10px_rgb(0,0,0,0.04)] active:scale-[0.98]",
         item.bg, item.border, item.color, item.hover
       )}
     >
@@ -414,7 +398,7 @@ export function AiChat() {
     { 
       id: 'welcome',
       role: 'assistant', 
-      content: "Welcome to ROOTAF Enterprise Intelligence. I'm here to provide verified insights, market analysis, and professional support for your strategic inquiries.\n\nHow may I assist your organization today?",
+      content: "Welcome to the ROOTAF Foundation. I'm here to provide verified insights, programmatic updates, and support regarding our foundation's impact.\n\nHow may I assist you today?",
       timestamp: new Date(),
     },
   ]);
@@ -467,7 +451,7 @@ export function AiChat() {
       setMessages(prev => [...prev, { 
         id: `assistant-${Date.now()}`,
         role: 'assistant', 
-        content: data?.answer || "I've processed your inquiry but couldn't locate specific data in our verified knowledge base. Please try rephrasing or ask about our core competencies: commodity markets, leadership, or operational services.", 
+        content: data?.answer || "I've processed your inquiry but couldn't locate specific data in our verified knowledge base. Please try rephrasing or ask about our core initiatives, leadership, or community outreach.", 
         sources: data?.sources,
         timestamp: new Date(),
       }]);
@@ -507,10 +491,10 @@ export function AiChat() {
             className={cn(
               "fixed bottom-6 right-6 z-50 h-14 w-14 rounded-2xl",
               "bg-gradient-to-br from-emerald-600 to-emerald-800",
-              "text-white shadow-2xl shadow-emerald-900/20",
+              "text-white shadow-[0_8px_30px_rgb(5,150,105,0.3)]",
               "flex items-center justify-center",
               "border border-emerald-400/30",
-              "hover:shadow-emerald-900/30 transition-shadow"
+              "hover:shadow-[0_8px_30px_rgb(5,150,105,0.4)] transition-all duration-300"
             )}
           >
             <MessageCircle className="h-6 w-6" />
@@ -528,11 +512,13 @@ export function AiChat() {
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className={cn(
-              "fixed z-50 inset-0 sm:inset-auto sm:bottom-0.5 sm:right-6",
-              "w-full sm:w-[480px] h-[100dvh] sm:h-[720px]",
+              "fixed z-50 inset-0 sm:inset-auto sm:bottom-6 sm:right-6",
+              "w-full sm:w-[440px] md:w-[480px]",
+              // Responsive height calculation that prevents overshooting
+              "h-[100dvh] sm:h-[calc(100dvh-48px)] sm:max-h-[720px]",
               "flex flex-col bg-white sm:rounded-3xl",
-              "border border-slate-200/60 shadow-2xl shadow-slate-900/15",
-              "overflow-hidden"
+              "border border-slate-200/50 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]",
+              "overflow-hidden backdrop-blur-xl"
             )}
           >
             {/* Header */}
@@ -542,10 +528,10 @@ export function AiChat() {
               "border-b border-white/10"
             )}>
               {/* Glass overlay */}
-              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm" />
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-md" />
               
               {/* Subtle pattern */}
-              <div className="absolute inset-0 opacity-[0.03]" 
+              <div className="absolute inset-0 opacity-[0.02]" 
                 style={{ 
                   backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
                   backgroundSize: '24px 24px'
@@ -568,16 +554,16 @@ export function AiChat() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm font-bold text-white tracking-tight">
-                        ROOTAF Intelligence
+                        ROOTAF Foundation
                       </h3>
-                      <span className="px-1.5 py-0.5 rounded-md bg-white/10 text-[10px] font-bold text-amber-300 border border-white/10">
-                        PRO
+                      <span className="px-1.5 py-0.5 rounded-md bg-white/10 text-[10px] font-bold text-emerald-300 border border-white/10">
+                        VERIFIED
                       </span>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span className="text-xs font-medium text-emerald-200/80">
-                        Enterprise Support Active
+                      <span className="text-xs font-medium text-emerald-100/90 tracking-wide">
+                        Foundation Support Active
                       </span>
                     </div>
                   </div>
@@ -598,7 +584,7 @@ export function AiChat() {
               ref={scrollRef} 
               className={cn(
                 "flex-1 overflow-y-auto px-6 py-6 space-y-6",
-                "bg-gradient-to-b from-slate-50/80 via-white to-white",
+                "bg-gradient-to-b from-slate-50/50 via-white to-white",
                 "scroll-smooth"
               )}
             >
@@ -619,10 +605,10 @@ export function AiChat() {
                   )}>
                     {/* Avatar */}
                     <div className={cn(
-                      "shrink-0 h-8 w-8 rounded-full flex items-center justify-center border-2",
+                      "shrink-0 h-8 w-8 rounded-full flex items-center justify-center border",
                       msg.role === 'user' 
-                        ? "bg-emerald-100 border-emerald-200 text-emerald-700"
-                        : "bg-gradient-to-br from-emerald-600 to-emerald-800 border-emerald-700 text-white shadow-md"
+                        ? "bg-slate-100 border-slate-200 text-slate-600"
+                        : "bg-gradient-to-br from-emerald-600 to-emerald-800 border-emerald-700 text-white shadow-sm"
                     )}>
                       {msg.role === 'user' 
                         ? <UserRound className="h-4 w-4" />
@@ -635,8 +621,8 @@ export function AiChat() {
                       <div className={cn(
                         "relative px-4 py-3 rounded-2xl shadow-sm",
                         msg.role === 'user'
-                          ? "bg-gradient-to-br from-emerald-600 to-emerald-700 text-white rounded-br-sm"
-                          : "bg-white border border-slate-200/80 rounded-tl-sm"
+                          ? "bg-slate-900 text-white rounded-br-sm" // Premium dark bubble for user
+                          : "bg-white border border-slate-200/60 rounded-tl-sm shadow-[0_2px_10px_rgb(0,0,0,0.02)]"
                       )}>
                         {msg.role === 'user' ? (
                           <p className="text-sm font-medium leading-relaxed">{msg.content}</p>
@@ -698,7 +684,7 @@ export function AiChat() {
             </div>
 
             {/* Input Area */}
-            <div className="px-5 py-4 bg-white border-t border-slate-100 shrink-0 space-y-3">
+            <div className="px-5 py-4 bg-white/80 backdrop-blur-md border-t border-slate-100 shrink-0 space-y-3">
               {/* Suggested Questions */}
               {messages.length <= 2 && !chatMutation.isPending && (
                 <div className="flex flex-wrap gap-2">
@@ -722,13 +708,13 @@ export function AiChat() {
                     ref={inputRef}
                     value={input}
                     onChange={e => setInput(e.target.value)}
-                    placeholder="Ask about markets, leadership, operations..."
+                    placeholder="Ask about initiatives, leadership, outreach..."
                     className={cn(
-                      "h-11 pl-4 pr-10 rounded-xl",
-                      "bg-slate-50 border-slate-200",
+                      "h-12 pl-4 pr-10 rounded-xl",
+                      "bg-slate-50/50 border-slate-200/80",
                       "focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:border-emerald-400",
                       "font-medium text-slate-700 placeholder:text-slate-400 text-sm",
-                      "transition-all"
+                      "transition-all shadow-sm"
                     )}
                   />
                   {input.length > 0 && (
@@ -737,7 +723,7 @@ export function AiChat() {
                       onClick={() => setInput('')}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                     >
-                      <X className="h-3.5 w-3.5" />
+                      <X className="h-4 w-4" />
                     </button>
                   )}
                 </div>
@@ -745,25 +731,25 @@ export function AiChat() {
                   type="submit" 
                   disabled={!input.trim() || chatMutation.isPending}
                   className={cn(
-                    "h-11 w-11 rounded-xl shrink-0",
+                    "h-12 w-12 rounded-xl shrink-0",
                     "bg-gradient-to-br from-emerald-600 to-emerald-700",
                     "hover:from-emerald-700 hover:to-emerald-800",
                     "disabled:opacity-40 disabled:cursor-not-allowed",
-                    "shadow-lg shadow-emerald-900/10 hover:shadow-xl hover:shadow-emerald-900/20",
+                    "shadow-[0_4px_14px_rgb(5,150,105,0.2)] hover:shadow-[0_6px_20px_rgb(5,150,105,0.3)]",
                     "transition-all active:scale-95"
                   )}
                 >
                   {chatMutation.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <Send className="h-4 w-4" />
+                    <Send className="h-4 w-4 ml-0.5" />
                   )}
                 </Button>
               </form>
               
               <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-400 font-medium">
-                <Zap className="h-3 w-3 text-amber-500" />
-                <span>ROOTAF Enterprise Intelligence • Verified Data Only</span>
+                <Zap className="h-3 w-3 text-emerald-500" />
+                <span>ROOTAF Foundation • Verified Data Only</span>
               </div>
             </div>
           </motion.div>
