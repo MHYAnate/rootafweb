@@ -600,7 +600,7 @@ export function AiChat() {
 
                     {/* Bubble */}
                     <div className="space-y-1 min-w-0">
-                      {/* <div className={cn(
+                      <div className={cn(
                         "relative px-4 py-3 rounded-2xl shadow-sm",
                         msg.role === 'user'
                           ? "bg-slate-900 text-white rounded-br-sm" // Premium dark bubble for user
@@ -623,16 +623,16 @@ export function AiChat() {
                                     {msg.sources.length}
                                   </span>
                                 </div>
-                                <div className="grid grid-cols-1 gap-2.5">
+                                {/* <div className="grid grid-cols-1 gap-2.5">
                                   {msg.sources.map((s, idx) => (
                                     <SourceCard key={idx} source={s} index={idx} />
                                   ))}
-                                </div>
+                                </div> */}
                               </div>
                             )}
                           </div>
                         )}
-                      </div> */}
+                      </div>
                       
                       {/* Meta */}
                       <div className={cn(
