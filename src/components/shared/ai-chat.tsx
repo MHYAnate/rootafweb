@@ -380,7 +380,7 @@ export function AiChat() {
     { 
       id: 'welcome',
       role: 'assistant', 
-      content: "Welcome to the ROOTAF Foundation. I'm here to provide verified insights, programmatic updates, and support regarding our foundation's impact.\n\nHow may I assist you today?",
+      content: "Welcome to the Uplifting Root Artisan Farmers Development Foundation. I'm here to provide verified insights, programmatic updates, and support regarding our foundation'.\n\nHow may I assist you today?",
       timestamp: new Date(),
     },
   ]);
