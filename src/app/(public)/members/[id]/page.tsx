@@ -297,7 +297,7 @@ export default function MemberProfilePage() {
                     <p className="text-sm text-primary font-bold">
                       {p.priceDisplayText || 'Contact for price'}
                     </p>
-                    <Separator />
+                    {/* <Separator />
                     <div onClick={(e) => e.preventDefault()}>
                       <RateMemberModal
                         memberId={member.id}
@@ -311,7 +311,7 @@ export default function MemberProfilePage() {
                           </button>
                         }
                       />
-                    </div>
+                    </div> */}
                   </CardContent>
                 </Card>
               </Link>
@@ -337,7 +337,7 @@ export default function MemberProfilePage() {
                     <p className="text-sm text-primary font-bold">
                       {s.priceDisplayText || 'Contact for price'}
                     </p>
-                    <Separator />
+                    {/* <Separator />
                     <div onClick={(e) => e.preventDefault()}>
                       <RateMemberModal
                         memberId={member.id}
@@ -351,7 +351,7 @@ export default function MemberProfilePage() {
                           </button>
                         }
                       />
-                    </div>
+                    </div> */}
                   </CardContent>
                 </Card>
               </Link>
@@ -394,14 +394,14 @@ export default function MemberProfilePage() {
                         {t.condition}
                       </Badge>
                     )}
-                    <Separator />
+                    {/* <Separator /> */}
                     {/* ── Rate this tool/lease ── */}
-                    <div onClick={(e) => e.preventDefault()}>
+                    {/* <div onClick={(e) => e.preventDefault()}>
                       <RateMemberModal
                         memberId={member.id}
                         memberName={user?.fullName || ''}
                         ratingCategory="TOOL_LEASE_RATING"
-                        toolId={t.id}
+                        
                         trigger={
                           <button className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 hover:underline underline-offset-2 transition-colors">
                             <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
@@ -409,7 +409,7 @@ export default function MemberProfilePage() {
                           </button>
                         }
                       />
-                    </div>
+                    </div> */}
                   </CardContent>
                 </Card>
               </Link>
