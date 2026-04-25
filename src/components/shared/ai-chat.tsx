@@ -536,7 +536,7 @@ export function AiChat() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm font-bold text-white tracking-tight">
-                      Uplifting Root Artisan Farmers Development Foundation
+                      Uplifting Root Artisan Farmers Development Foundation intelligence
                       </h3>
                       <span className="px-1.5 py-0.5 rounded-md bg-white/10 text-[10px] font-bold text-emerald-300 border border-white/10">
                         VERIFIED
@@ -545,7 +545,7 @@ export function AiChat() {
                     <div className="flex items-center gap-2 mt-0.5">
                       <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       <span className="text-xs font-medium text-emerald-100/90 tracking-wide">
-                        RootAF A I Active
+                        RootAF I Active
                       </span>
                     </div>
                   </div>
