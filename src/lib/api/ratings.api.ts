@@ -43,6 +43,7 @@ export interface Rating {
   member?:  { user: { fullName: string } };
   product?: { name: string };
   service?: { name: string };
+  tool?:    { name: string };
 }
 
 export interface RatingsMeta {
