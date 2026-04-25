@@ -81,7 +81,8 @@ interface RatingFormProps {
   ratingCategory?: RatingCategory;
   productId?: string;
   serviceId?: string;
-  toolId?: string;
+  // toolId intentionally omitted — Rating table has no toolId column.
+  // TOOL_LEASE_RATING is identified by memberId + ratingCategory alone.
   onSuccess?: () => void;
 }
 
@@ -92,7 +93,6 @@ export function RatingForm({
   ratingCategory = 'OVERALL_MEMBER',
   productId,
   serviceId,
-  toolId,
   onSuccess,
 }: RatingFormProps) {
   const { mutate: createRating, isPending } = useCreateRating(memberId);
@@ -112,17 +112,14 @@ export function RatingForm({
   const reviewText     = watch('reviewText') ?? '';
   const remainingChars = 2000 - reviewText.length;
 
-  const subRatings = SUB_RATINGS_BY_CATEGORY[ratingCategory];
-  const coreFields = subRatings.filter((s) => s.tier === 'core');
+  const subRatings      = SUB_RATINGS_BY_CATEGORY[ratingCategory];
+  const coreFields      = subRatings.filter((s) => s.tier === 'core');
   const secondaryFields = subRatings.filter((s) => s.tier === 'secondary');
 
   const onSubmit = (values: RatingFormValues) => {
     const payload: CreateRatingPayload = {
       memberId,
       ratingCategory,
-      productId,
-      serviceId,
-      toolId,
       overallRating:       values.overallRating,
       qualityRating:       values.qualityRating       || undefined,
       communicationRating: values.communicationRating || undefined,
@@ -130,6 +127,11 @@ export function RatingForm({
       timelinessRating:    values.timelinessRating    || undefined,
       reviewTitle:         values.reviewTitle         || undefined,
       reviewText:          values.reviewText          || undefined,
+      // Only attach the context ID that matches the active category.
+      // TOOL_LEASE_RATING sends no extra ID — the backend identifies it
+      // via memberId + ratingCategory which is sufficient for de-duplication.
+      ...(ratingCategory === 'PRODUCT_RATING' && productId && { productId }),
+      ...(ratingCategory === 'SERVICE_RATING' && serviceId && { serviceId }),
     };
 
     createRating(payload, {
@@ -143,7 +145,7 @@ export function RatingForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
 
-      {/* ── Section 1: Overall rating (Premium Gradient Highlight) ────────── */}
+      {/* ── Section 1: Overall rating ──────────────────────────────────────── */}
       <div className="relative overflow-hidden rounded-2xl border border-amber-200/60 bg-gradient-to-br from-amber-50 to-amber-100/50 px-5 py-4 shadow-sm dark:border-amber-900/50 dark:from-amber-950/40 dark:to-amber-900/20">
         <p className="text-[10px] font-bold uppercase tracking-widest text-amber-800 dark:text-amber-400 mb-3">
           {CATEGORY_LABELS[ratingCategory]}
@@ -165,7 +167,7 @@ export function RatingForm({
         />
       </div>
 
-      {/* ── Section 2: Core sub-ratings (iOS Settings Style) ──────────────── */}
+      {/* ── Section 2: Core sub-ratings ───────────────────────────────────── */}
       <div className="rounded-2xl border bg-card shadow-sm overflow-hidden">
         <div className="bg-muted/40 px-5 py-2.5 border-b border-border/50">
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -243,8 +245,12 @@ export function RatingForm({
       {/* ── Section 4: Written review ──────────────────────────────────────── */}
       <div className="space-y-4 px-1">
         <div>
-          <Label htmlFor="reviewTitle" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Review Title <span className="ml-1 font-normal normal-case opacity-70">(optional)</span>
+          <Label
+            htmlFor="reviewTitle"
+            className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+          >
+            Review Title{' '}
+            <span className="ml-1 font-normal normal-case opacity-70">(optional)</span>
           </Label>
           <Input
             id="reviewTitle"
@@ -259,8 +265,12 @@ export function RatingForm({
         </div>
 
         <div>
-          <Label htmlFor="reviewText" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Your Review <span className="ml-1 font-normal normal-case opacity-70">(optional)</span>
+          <Label
+            htmlFor="reviewText"
+            className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+          >
+            Your Review{' '}
+            <span className="ml-1 font-normal normal-case opacity-70">(optional)</span>
           </Label>
           <Textarea
             id="reviewText"
@@ -276,10 +286,14 @@ export function RatingForm({
             ) : (
               <span />
             )}
-            <p className={cn(
-              'text-[11px] transition-colors duration-300',
-              remainingChars < 100 ? 'text-amber-600 font-medium' : 'text-muted-foreground/70',
-            )}>
+            <p
+              className={cn(
+                'text-[11px] transition-colors duration-300',
+                remainingChars < 100
+                  ? 'text-amber-600 font-medium'
+                  : 'text-muted-foreground/70',
+              )}
+            >
               {remainingChars} characters remaining
             </p>
           </div>

@@ -81,15 +81,6 @@ const SUGGESTED_QUESTIONS = [
     border: 'border-slate-200/60',
     hover: 'hover:bg-slate-100/80 hover:border-slate-300'
   },
-  // { 
-  //   icon: Globe, 
-  //   text: 'Community outreach initiatives', 
-  //   category: 'Operations',
-  //   color: 'text-amber-700',
-  //   bg: 'bg-amber-50/80',
-  //   border: 'border-amber-200/60',
-  //   hover: 'hover:bg-amber-100/80 hover:border-amber-300'
-  // },
   { 
     icon: TrendingUp, 
     text: 'Who is Nuhu Ibrahim Majidadi?', 
@@ -108,15 +99,6 @@ const SUGGESTED_QUESTIONS = [
     border: 'border-emerald-200',
     hover: 'hover:bg-emerald-100 hover:border-emerald-300'
   },
-  // { 
-  //   icon: Building2, 
-  //   text: 'Executive leadership team', 
-  //   category: 'Corporate',
-  //   color: 'text-slate-700',
-  //   bg: 'bg-slate-50',
-  //   border: 'border-slate-200',
-  //   hover: 'hover:bg-slate-100 hover:border-slate-300'
-  // },
   { 
     icon: Wrench, 
     text: 'Equipment & tools services', 
@@ -451,7 +433,7 @@ export function AiChat() {
       setMessages(prev => [...prev, { 
         id: `assistant-${Date.now()}`,
         role: 'assistant', 
-        content: data?.answer || "I've processed your inquiry but couldn't locate specific data in our verified knowledge base. Please try rephrasing or ask about our core initiatives, leadership, or community outreach.", 
+        content: data?.answer || "I've processed your inquiry but couldn't locate specific data in our verified knowledge base. Please try rephrasing or ask about our core initiatives, leadership or market analysis.", 
         sources: data?.sources,
         timestamp: new Date(),
       }]);
@@ -554,7 +536,7 @@ export function AiChat() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm font-bold text-white tracking-tight">
-                        ROOTAF Foundation
+                      Uplifting Root Artisan Farmers Development Foundation
                       </h3>
                       <span className="px-1.5 py-0.5 rounded-md bg-white/10 text-[10px] font-bold text-emerald-300 border border-white/10">
                         VERIFIED
@@ -563,7 +545,7 @@ export function AiChat() {
                     <div className="flex items-center gap-2 mt-0.5">
                       <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       <span className="text-xs font-medium text-emerald-100/90 tracking-wide">
-                        Foundation Support Active
+                        RootAF A I Active
                       </span>
                     </div>
                   </div>
@@ -618,7 +600,7 @@ export function AiChat() {
 
                     {/* Bubble */}
                     <div className="space-y-1 min-w-0">
-                      <div className={cn(
+                      {/* <div className={cn(
                         "relative px-4 py-3 rounded-2xl shadow-sm",
                         msg.role === 'user'
                           ? "bg-slate-900 text-white rounded-br-sm" // Premium dark bubble for user
@@ -650,7 +632,7 @@ export function AiChat() {
                             )}
                           </div>
                         )}
-                      </div>
+                      </div> */}
                       
                       {/* Meta */}
                       <div className={cn(
@@ -749,7 +731,7 @@ export function AiChat() {
               
               <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-400 font-medium">
                 <Zap className="h-3 w-3 text-emerald-500" />
-                <span>ROOTAF Foundation • Verified Data Only</span>
+                <span>Uplifting Root Artisan Farmers Development Foundation • Verified Data Only</span>
               </div>
             </div>
           </motion.div>
